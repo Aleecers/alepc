@@ -1,0 +1,18 @@
+[package]
+name = "apc"
+version = "0.0.0"
+edition = "2021"
+license = "GPL-3.0-only"
+authors = ["Awiteb <https://github.com/TheAwiteb>"]
+readme = "README.md"
+description = "Simple CLI to create aleecers post template 🦀"
+repository = "https://github.com/aleecers/apc"
+keywords = ["helper", "CLI"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+colored = "= 2.0.0"
+requestty = "0.4.1"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
