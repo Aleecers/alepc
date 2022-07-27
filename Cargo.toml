@@ -1,18 +1,25 @@
 [package]
-name = "apc"
-version = "0.0.0"
+name = "alepc"
+version = "0.1.0" # Don't forget to update the version in `./src/app.rs`
 edition = "2021"
+rust-version = "1.62"
 license = "GPL-3.0-only"
 authors = ["Awiteb <https://github.com/TheAwiteb>"]
 readme = "README.md"
 description = "Simple CLI to create aleecers post template 🦀"
-repository = "https://github.com/aleecers/apc"
+repository = "https://github.com/aleecers/Alepc"
 keywords = ["helper", "CLI"]
 categories = ["command-line-utilities"]
 
 [dependencies]
+chrono = "= 0.4.19"
 colored = "= 2.0.0"
-requestty = "0.4.1"
+requestty = "= 0.4.1"
+ron = "= 0.7.1"
+serde = { version = "= 1.0.140", features = ["derive"] }
+strum = { version = "= 0.24.1", features = ["derive"] }
+thiserror = "= 1.0.31"
+url = { version = "= 2.2.2", features = ["serde"] }
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
