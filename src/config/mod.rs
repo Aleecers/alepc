@@ -15,20 +15,6 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::errors::ApcError;
+mod config_utils;
 
-mod app;
-mod config;
-mod errors;
-mod utils;
-
-fn main() {
-    if let Some(apc_config) = config::get_config() {
-        if let Err(err) = app::run(&apc_config) {
-            match err {
-                ApcError::Requestty(_) => (),
-                err => err.print(),
-            }
-        }
-    }
-}
+pub use config_utils::*;

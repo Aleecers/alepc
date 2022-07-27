@@ -1,0 +1,86 @@
+// Simple CLI to create aleecers post template
+//     Copyright (C) 2020-2022  TheAwiteb
+//     https://github.com/aleecers/Alepc
+//
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+//
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+//
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Config(
+    /// Path of posts directory
+    posts_path: "../Aleecers.github.io/src/pages/blog/",
+    /// Path to images directory
+    images_path: "../Aleecers.github.io/public/images/",
+    /// Path of blog in the site
+    blog_site_path: "/blog/",
+    /// Path of images in the site
+    images_site_path: "/images/",
+    /// Layout path of posts ( path start from `posts_path` )
+    posts_layout: "../../layouts/blog.astro",
+    /// Repository url
+    repository_url: "https://github.com/aleecers/alepc",
+    /// Date format
+    date_format: "%Y/%m/%d",
+
+    /// Select action structure
+    select_action: (
+        /// The question of select action
+        select_action_message: "What do you want to do ❓",
+        /// Create a new post choice in select
+        new_post_choice: "Create a new post ✍",
+        /// Update modifed post date choice
+        update_modified_post_date: "Update modified date 📅",
+        /// Version choice
+        version_choice: "Alepc Version ⚙",
+    ),
+
+    /// Inputs setting
+    input_settings: (
+        /// Minimum length of post title
+        minimum_title_length: 7,
+        /// Maximum length of post title
+        maximum_title_length: 30,
+        /// Ask for post title message
+        title_message: "Title of post 📝",
+
+        /// Minimum length of post description
+        minimum_description_length: 10,
+        /// Maximum length of post description
+        // it's will save as u8 maximum is 255
+        maximum_description_length: 255,
+        /// Ask for post description message
+        description_message: "Description of post 📝",
+
+        /// Minimum tags on post
+        minimum_tags_count: 1,
+        /// Maximum tags on post
+        maximum_tags_count: 3,
+        /// Ask for post tags message
+        tags_message: "Tags of post (separated by comma)",
+        /// Separated tags by
+        separated_tags_by: ',',
+        /// Minimum single tag length
+        minimum_single_tag_length: 3,
+        /// Maximum single tag length
+        maximum_single_tag_length: 8,
+
+        /// Ask for post slug message
+        slug_message: "Slug of post",
+        /// Minimum length of post slug
+        minimum_slug_length: 5,
+        /// Maximum length of post slug
+        maximum_slug_length: 20,
+
+        /// Ask for post image message
+        image_message: "Image of post",
+    ),
+)
