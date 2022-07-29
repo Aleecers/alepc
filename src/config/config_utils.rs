@@ -16,9 +16,14 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::errors::{ApcError, ApcResult};
+use directories::ProjectDirs;
+use ron::ser as ron_ser;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+
+pub const ORGANIZATION: &str = "Aleecers";
+pub const APP_NAME: &str = "alepc";
 
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
@@ -129,31 +134,60 @@ pub struct Config {
 
 impl Config {
     /// Return the configuration if it's valid
-    pub fn configuration(self) -> ApcResult<Config> {
+    pub fn configuration(self) -> ApcResult<Self> {
+        let config_issue = "\n\tsee: <https://github.com/Aleecers/alepc/issues/2>";
         if !Path::new(&self.posts_path).exists() {
             return Err(ApcError::Validation(format!(
-                "Invalid posts_path, '{}' does not exist. Update the path from 'src/config/config.ron'",
+                "Invalid posts_path '{}' does not exist. Update the path from config file {config_issue}",
                 self.posts_path
             )));
         }
         if !(self.blog_site_path.ends_with('/') && self.blog_site_path.starts_with('/')) {
             return Err(ApcError::Validation(format!(
-                "Invalid blog_path, '{}' should start and end with a slash ('/')",
+                "Invalid blog_path, '{}' should start and end with a slash ('/') {config_issue}",
                 self.blog_site_path,
             )));
         }
+        Ok(self)
+    }
+    /// Write configuration file in config directory
+    pub fn write(self, config_path: &Path) -> ApcResult<Self> {
+        if !config_path.parent().unwrap().exists() {
+            fs::create_dir_all(config_path.parent().unwrap())
+                .map_err(|err| ApcError::FileSystem(err.to_string()))?
+        }
+        fs::write(
+            config_path,
+            ron_ser::to_string_pretty(&self, ron_ser::PrettyConfig::default()).map_err(|err| {
+                ApcError::ParseRon {
+                    code: err.code,
+                    position: err.position,
+                }
+            })?,
+        )
+        .map_err(|err| ApcError::FileSystem(err.to_string()))?;
         Ok(self)
     }
 }
 
 /// Return config
 pub fn config() -> ApcResult<ApcResult<Config>> {
-    match fs::read_to_string("./src/config/config.ron") {
-        Ok(str_ron) => Ok(ron::from_str(&str_ron).map_err(|err| ApcError::ParseRon {
-            code: err.code,
-            position: err.position,
-        })),
-        Err(err) => Err(ApcError::LoadConfig(err.to_string())),
+    let config_path = ProjectDirs::from("", ORGANIZATION, APP_NAME)
+        .map(|path| path.config_dir().join("config.ron"));
+    if let Some(config_path) = config_path {
+        if config_path.exists() {
+            match fs::read_to_string(config_path) {
+                Ok(str_ron) => Ok(ron::from_str(&str_ron).map_err(|err| ApcError::ParseRon {
+                    code: err.code,
+                    position: err.position,
+                })),
+                Err(err) => Err(ApcError::FileSystem(err.to_string())),
+            }
+        } else {
+            Ok(Config::default().write(&config_path))
+        }
+    } else {
+        Ok(Ok(Config::default()))
     }
 }
 
