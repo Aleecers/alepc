@@ -25,6 +25,47 @@ use std::path::Path;
 pub const ORGANIZATION: &str = "Aleecers";
 pub const APP_NAME: &str = "alepc";
 
+/// Make if statements if (`bool_expr`) return `true` will return `Err(ApcError::Validation(`error_message`))`
+macro_rules! validation_check {
+    ($bool_expr: expr, $error_message: expr) => {
+        if $bool_expr {
+            return Err(ApcError::Validation($error_message.to_string()));
+        }
+    };
+    ($bool_expr: expr, $error_message: expr, $($bool_exprs: expr, $error_messages: expr),+) => {
+        validation_check!($bool_expr, $error_message);
+        validation_check!($($bool_exprs, $error_messages),+)
+    };
+}
+
+macro_rules! validate_configuration_path {
+    ($path: expr, $path_name: ident, $config_message: expr) => {
+        validation_check!(
+            !Path::new($path).exists(),
+            format!(
+                "Invalid `{p_n}` '{p}' does not exist. Update `{p_n}` from config file{c}",
+                p_n = stringify!($path_name),
+                p = $path,
+                c = $config_message,
+            )
+        )
+    };
+}
+
+macro_rules! validate_configuration_slashes {
+    ($value: expr, $name: ident, $config_message: expr) => {
+        let name = stringify!($name);
+        let config_message = $config_message;
+        let value = $value;
+        validation_check!(
+            !$value.ends_with('/'),
+            format!("Invalid `{name}` '{value}' must ends with a slash {config_message}",),
+            !$value.starts_with('/'),
+            format!("Invalid `{name}` '{value}' must starts with a slash {config_message}",)
+        )
+    };
+}
+
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
 /// Select action configuration structure
@@ -136,18 +177,18 @@ impl Config {
     /// Return the configuration if it's valid
     pub fn configuration(self) -> ApcResult<Self> {
         let config_issue = "\n\tsee: <https://github.com/Aleecers/alepc/issues/2>";
-        if !Path::new(&self.posts_path).exists() {
-            return Err(ApcError::Validation(format!(
-                "Invalid posts_path '{}' does not exist. Update the path from config file {config_issue}",
-                self.posts_path
-            )));
-        }
-        if !(self.blog_site_path.ends_with('/') && self.blog_site_path.starts_with('/')) {
-            return Err(ApcError::Validation(format!(
-                "Invalid blog_path, '{}' should start and end with a slash ('/') {config_issue}",
-                self.blog_site_path,
-            )));
-        }
+        validate_configuration_path!(&self.posts_path, posts_path, config_issue);
+        validate_configuration_path!(&self.images_path, images_path, config_issue);
+        validate_configuration_path!(
+            Path::new(&self.posts_path)
+                .join(&self.posts_layout)
+                .to_str()
+                .unwrap(),
+            posts_layout,
+            config_issue
+        );
+        validate_configuration_slashes!(&self.blog_site_path, blog_site_path, config_issue);
+        validate_configuration_slashes!(&self.images_site_path, images_site_path, config_issue);
         Ok(self)
     }
     /// Write configuration file in config directory
