@@ -16,9 +16,8 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::config::Config;
-use crate::errors::ApcResult;
+use crate::errors::{ApcError, ApcResult};
 use crate::utils::slug_updater;
-use crate::ApcError;
 use chrono::prelude::*;
 use std::fs;
 use std::path::Path;

@@ -15,7 +15,8 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::errors::ApcError;
+#[macro_use]
+extern crate educe;
 
 mod app;
 mod config;
@@ -26,7 +27,7 @@ fn main() {
     if let Some(apc_config) = config::get_config() {
         if let Err(err) = app::run(&apc_config) {
             match err {
-                ApcError::Requestty(_) => (),
+                errors::ApcError::Requestty(_) => (),
                 err => err.print(),
             }
         }
