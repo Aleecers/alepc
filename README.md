@@ -38,6 +38,7 @@ CLI to create post template for [aleecers blog]
 - Rename image to "{post-slug}-header.{extension}"
 - Easy to use
 - Configuration file ( [RON] )
+- Save configuration file in config system directory [#6], [#2], [#9]
 
 ## Installation
 ### Assets
@@ -74,3 +75,6 @@ GNU General Public License version 3 of the license for more see <https://www.gn
 [RON]: https://github.com/ron-rs/ron
 [release page]: https://github.com/aleecers/alepc/releases/latest
 [Cargo]: https://doc.rust-lang.org/cargo/getting-started/installation.html
+[#2]: https://github.com/Aleecers/alepc/issues/2
+[#6]: https://github.com/Aleecers/alepc/issues/6
+[#9]: https://github.com/Aleecers/alepc/pull/9
