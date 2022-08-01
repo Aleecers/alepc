@@ -70,8 +70,13 @@ pub fn copy_image(config: &Config, slug: &str, image_path: &str) -> ApcResult<St
     let slug = slug_updater(slug);
     let filename = format!("{slug}-header.{extension}");
     let to_path = format!("{}{slug}/{filename}", config.images_path,);
-    fs::create_dir(format!("{}{slug}/", config.images_path))
-        .map_err(|err| ApcError::FileSystem(err.to_string()))?;
-    fs::copy(full_image_path, to_path).map_err(|err| ApcError::FileSystem(err.to_string()))?;
+    fs::create_dir(format!("{}{slug}/", config.images_path)).map_err(|err| {
+        log::error!("{:?}", err);
+        ApcError::FileSystem(err.to_string())
+    })?;
+    fs::copy(full_image_path, to_path).map_err(|err| {
+        log::error!("{:?}", err);
+        ApcError::FileSystem(err.to_string())
+    })?;
     Ok(filename)
 }

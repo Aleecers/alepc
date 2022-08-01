@@ -24,6 +24,8 @@ use crate::utils::{full_path, slug_updater, tags_updater, to_post_path};
 use requestty::{Answers, Question};
 
 /// Returns the post title question
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 fn post_title_question(config: &Config) -> Question {
     Question::input("post_title")
         .message(&config.input_settings.title_message)
@@ -48,6 +50,8 @@ fn post_title_question(config: &Config) -> Question {
 }
 
 /// Returns the post description question
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 fn post_description_question(config: &Config) -> Question {
     Question::input("post_description")
         .message(&config.input_settings.description_message)
@@ -72,6 +76,8 @@ fn post_description_question(config: &Config) -> Question {
 }
 
 /// Returns the psst tags question
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 fn post_tags_question(config: &Config) -> Question {
     Question::input("post_tags")
         .message(&config.input_settings.tags_message)
@@ -105,6 +111,8 @@ fn post_tags_question(config: &Config) -> Question {
 }
 
 /// Returns the post slug question
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 fn post_slug_question(config: &Config) -> Question {
     Question::input("post_slug")
         .message(&config.input_settings.slug_message)
@@ -140,6 +148,8 @@ fn post_slug_question(config: &Config) -> Question {
 }
 
 /// Returns the post image question
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 fn post_image_question(config: &Config) -> Question {
     Question::input("post_image")
         .message(&config.input_settings.image_message)
@@ -155,6 +165,8 @@ fn post_image_question(config: &Config) -> Question {
 }
 
 /// Return all properties questions of post
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 pub fn post_properties(config: &Config) -> Vec<Question> {
     vec![
         post_title_question(config),

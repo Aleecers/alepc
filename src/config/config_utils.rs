@@ -175,6 +175,8 @@ pub struct Config {
 
 impl Config {
     /// Return the configuration if it's valid
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn configuration(self) -> ApcResult<Self> {
         let config_issue = "\n\tsee: <https://github.com/Aleecers/alepc/issues/2>";
         validate_configuration_path!(&self.posts_path, posts_path, config_issue);
@@ -192,10 +194,14 @@ impl Config {
         Ok(self)
     }
     /// Write configuration file in config directory
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn write(self, config_path: &Path) -> ApcResult<Self> {
         if !config_path.parent().unwrap().exists() {
-            fs::create_dir_all(config_path.parent().unwrap())
-                .map_err(|err| ApcError::FileSystem(err.to_string()))?
+            fs::create_dir_all(config_path.parent().unwrap()).map_err(|err| {
+                log::error!("{:?}", err);
+                ApcError::FileSystem(err.to_string())
+            })?
         }
         fs::write(
             config_path,
@@ -206,12 +212,17 @@ impl Config {
                 }
             })?,
         )
-        .map_err(|err| ApcError::FileSystem(err.to_string()))?;
+        .map_err(|err| {
+            log::error!("{:?}", err);
+            ApcError::FileSystem(err.to_string())
+        })?;
         Ok(self)
     }
 }
 
 /// Return config
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 pub fn config() -> ApcResult<ApcResult<Config>> {
     let config_path = ProjectDirs::from("", ORGANIZATION, APP_NAME)
         .map(|path| path.config_dir().join("config.ron"));
@@ -233,6 +244,8 @@ pub fn config() -> ApcResult<ApcResult<Config>> {
 }
 
 /// Return [`Config`] if there is no errors else [`None`]
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 pub fn get_config() -> Option<Config> {
     match config() {
         Ok(ron_result) => match ron_result {

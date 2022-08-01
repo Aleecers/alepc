@@ -36,12 +36,16 @@ pub enum ApcError {
 }
 
 impl ApcError {
-    /// return varint name
+    /// return variant name
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn name(&self) -> &'static str {
         self.into()
     }
 
     /// Print error message
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn print(&self) {
         eprintln!("{}: {}", format!("{}Error", self.name()).red(), self)
     }
