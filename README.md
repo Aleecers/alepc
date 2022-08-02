@@ -38,7 +38,8 @@ CLI to create post template for [aleecers blog]
 - Rename image to "{post-slug}-header.{extension}"
 - Easy to use
 - Configuration file ( [RON] )
-- Save configuration file in config system directory [#6], [#2], [#9]
+- Save configuration file in config system directory [`#6`], [`#2`], [`#9`]
+- The ability to show the [logs](#Logging) [`#5`], [`#11`]
 
 ## Installation
 ### Assets
@@ -60,6 +61,9 @@ cargo build --release
 ```
 after the build you can find binary file in `./target/release/alepc`
 
+## Logging
+To show logs run Alepc with [`RUST_LOG`] environment variable with [`trace`] value
+
 ## Images
 
 | Home                                      | Create                                     |
@@ -75,6 +79,10 @@ GNU General Public License version 3 of the license for more see <https://www.gn
 [RON]: https://github.com/ron-rs/ron
 [release page]: https://github.com/aleecers/alepc/releases/latest
 [Cargo]: https://doc.rust-lang.org/cargo/getting-started/installation.html
-[#2]: https://github.com/Aleecers/alepc/issues/2
-[#6]: https://github.com/Aleecers/alepc/issues/6
-[#9]: https://github.com/Aleecers/alepc/pull/9
+[`trace`]: https://docs.rs/log/latest/log/enum.Level.html#variant.Trace
+[`RUST_LOG`]: https://docs.rs/env_logger/0.9.0/env_logger/#enabling-logging
+[`#2`]: https://github.com/Aleecers/alepc/issues/2
+[`#6`]: https://github.com/Aleecers/alepc/issues/6
+[`#9`]: https://github.com/Aleecers/alepc/pull/9
+[`#5`]: https://github.com/Aleecers/alepc/issues/5
+[`#11`]: https://github.com/Aleecers/alepc/pull/11
