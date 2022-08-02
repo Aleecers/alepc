@@ -17,6 +17,9 @@
 
 #[macro_use]
 extern crate educe;
+#[macro_use]
+extern crate log_derive;
+extern crate pretty_env_logger;
 
 mod app;
 mod config;
@@ -24,6 +27,7 @@ mod errors;
 mod utils;
 
 fn main() {
+    pretty_env_logger::init();
     if let Some(apc_config) = config::get_config() {
         if let Err(err) = app::run(&apc_config) {
             match err {

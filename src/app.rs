@@ -22,6 +22,7 @@ use crate::utils::questions::post_properties;
 use crate::utils::Post;
 use requestty::{prompt, Answers, Question};
 
+#[derive(Debug)]
 pub enum PostAction {
     Create,
     Version,
@@ -31,6 +32,8 @@ pub enum PostAction {
 const VERSION: &str = "0.1.0";
 
 /// Return the questions
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 fn questions(config: &Config) -> Vec<Question> {
     let mut questions = vec![Question::select("action")
         .message(&config.select_action.select_action_message)
@@ -46,10 +49,13 @@ fn questions(config: &Config) -> Vec<Question> {
 }
 
 /// Returns post from answers, None if there is no post
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 pub fn post_from_answers<'a>(
     apc_config: &'a Config,
     answers: &'a Answers,
 ) -> ApcResult<(Option<Post<'a>>, PostAction)> {
+    // FIXME: Use `match`
     if answers.get("action").unwrap().as_list_item().unwrap().text
         == apc_config.select_action.new_post_choice
     {
@@ -96,8 +102,13 @@ pub fn post_from_answers<'a>(
     }
 }
 
+#[logfn(Debug)]
+#[logfn_inputs(Info)]
 pub fn run(config: &Config) -> ApcResult<()> {
-    let answers = prompt(questions(config)).map_err(|err| ApcError::Requestty(err.to_string()))?;
+    let answers = prompt(questions(config)).map_err(|err| {
+        log::error!("{:?}", err);
+        ApcError::Requestty(err.to_string())
+    })?;
     let (post, action) = post_from_answers(config, &answers)?;
     match action {
         PostAction::Create => post.unwrap().write_in_file(config)?,

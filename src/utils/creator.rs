@@ -23,6 +23,7 @@ use std::fs;
 use std::path::Path;
 
 /// Struct containing the post information
+#[derive(Debug)]
 pub struct Post<'a> {
     title: &'a str,
     layout: &'a str,
@@ -37,6 +38,8 @@ pub struct Post<'a> {
 }
 
 impl<'a> Post<'a> {
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn new(
         config: &'a Config,
         title: &'a str,
@@ -64,6 +67,8 @@ impl<'a> Post<'a> {
         }
     }
 
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn to_post_properties(&self, config: &Config) -> String {
         format!(
             "---\ntitle: \"{}\"\n\
@@ -93,13 +98,17 @@ impl<'a> Post<'a> {
     }
 
     /// Write the post properties to file
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
     pub fn write_in_file(&self, config: &Config) -> ApcResult<()> {
         let slug = slug_updater(self.slug);
         let file_path = Path::new(&config.posts_path)
             .join(&slug)
             .with_extension("md");
-        fs::write(file_path, self.to_post_properties(config))
-            .map_err(|err| ApcError::FileSystem(err.to_string()))?;
+        fs::write(file_path, self.to_post_properties(config)).map_err(|err| {
+            log::error!("{:?}", err);
+            ApcError::FileSystem(err.to_string())
+        })?;
 
         Ok(())
     }
