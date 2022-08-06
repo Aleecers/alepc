@@ -15,18 +15,19 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+mod statuses;
+
 use colored::Colorize;
 use ron::error::{ErrorCode, Position};
 use strum::IntoStaticStr;
 use thiserror::Error;
 
+pub use statuses::Statuses;
 /// Alepc errors
 #[derive(IntoStaticStr, Error, Debug)]
 pub enum ApcError {
     #[error("Cannot parse config file '{code}' in {position}")]
     ParseRon { code: ErrorCode, position: Position },
-    #[error("Cannot load config file '{0}'")]
-    LoadConfig(String),
     #[error("{0}")]
     Validation(String),
     #[error("{0}")]

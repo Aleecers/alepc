@@ -26,14 +26,15 @@ mod config;
 mod errors;
 mod utils;
 
-fn main() {
+fn main() -> errors::Statuses<errors::ApcError> {
     pretty_env_logger::init();
-    if let Some(apc_config) = config::get_config() {
-        if let Err(err) = app::run(&apc_config) {
-            match err {
-                errors::ApcError::Requestty(_) => (),
-                err => err.print(),
-            }
-        }
+    let alepc_config = config::get_config();
+    if let Ok(alepc_config) = alepc_config {
+        // Will run `errors::Statuses::report`-> `errors::ApcError::report`
+        // if it's error else return `ExitCode::SUCCESS`
+        app::run(&alepc_config).into()
+    } else {
+        // Will run `errors::Statuses::report`-> `errors::ApcError::report`
+        alepc_config.into()
     }
 }

@@ -243,19 +243,9 @@ pub fn config() -> ApcResult<ApcResult<Config>> {
     }
 }
 
-/// Return [`Config`] if there is no errors else [`None`]
+/// Return [`Config`]
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-pub fn get_config() -> Option<Config> {
-    match config() {
-        Ok(ron_result) => match ron_result {
-            Ok(apc_config) => match apc_config.configuration() {
-                Ok(config) => return Some(config),
-                Err(err) => err.print(),
-            },
-            Err(err) => err.print(),
-        },
-        Err(err) => err.print(),
-    }
-    None
+pub fn get_config() -> ApcResult<Config> {
+    config()??.configuration()
 }
