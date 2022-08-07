@@ -48,7 +48,8 @@ impl ApcError {
     #[logfn(Debug)]
     #[logfn_inputs(Info)]
     pub fn print(&self) {
-        eprintln!("{}: {}", format!("{}Error", self.name()).red(), self)
+        (!matches!(self, Self::Requestty(_)))
+            .then(|| eprintln!("{}: {}", format!("{}Error", self.name()).red(), self));
     }
 }
 
