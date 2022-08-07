@@ -39,7 +39,7 @@ macro_rules! validation_check {
 }
 
 macro_rules! validate_configuration_path {
-    ($path: expr, $path_name: ident, $config_message: expr, $check_dir: expr) => {
+    ($path: expr, $path_name: ident, $config_message: expr, $check_is_dir: expr) => {
         validation_check!(
             !Path::new($path).exists(),
             format!(
@@ -49,17 +49,21 @@ macro_rules! validate_configuration_path {
                 c = $config_message,
             )
         );
-        if $check_dir {
-            validation_check!(
-                !Path::new($path).is_dir(),
-                format!(
-                    "Invalid `{p_n}` `{p}` it's not directory'{c}",
-                    p_n = stringify!($path_name),
-                    p = $path,
-                    c = $config_message,
-                )
+
+        validation_check!(
+            if $check_is_dir {
+                !Path::new($path).is_dir()
+            } else {
+                !Path::new($path).is_file()
+            },
+            format!(
+                "Invalid `{p_n}` `{p}` it's not {path_type}{c}",
+                p_n = stringify!($path_name),
+                p = $path,
+                c = $config_message,
+                path_type = if $check_is_dir { "directory" } else { "file" }
             )
-        }
+        )
     };
 }
 
