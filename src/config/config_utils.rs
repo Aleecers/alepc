@@ -39,7 +39,7 @@ macro_rules! validation_check {
 }
 
 macro_rules! validate_configuration_path {
-    ($path: expr, $path_name: ident, $config_message: expr) => {
+    ($path: expr, $path_name: ident, $config_message: expr, $check_dir: expr) => {
         validation_check!(
             !Path::new($path).exists(),
             format!(
@@ -48,7 +48,18 @@ macro_rules! validate_configuration_path {
                 p = $path,
                 c = $config_message,
             )
-        )
+        );
+        if $check_dir {
+            validation_check!(
+                !Path::new($path).is_dir(),
+                format!(
+                    "Invalid `{p_n}` `{p}` it's not directory'{c}",
+                    p_n = stringify!($path_name),
+                    p = $path,
+                    c = $config_message,
+                )
+            )
+        }
     };
 }
 
@@ -179,15 +190,16 @@ impl Config {
     #[logfn_inputs(Info)]
     pub fn configuration(self) -> ApcResult<Self> {
         let config_issue = "\n\tsee: <https://github.com/Aleecers/alepc/issues/2>";
-        validate_configuration_path!(&self.posts_path, posts_path, config_issue);
-        validate_configuration_path!(&self.images_path, images_path, config_issue);
+        validate_configuration_path!(&self.posts_path, posts_path, config_issue, true);
+        validate_configuration_path!(&self.images_path, images_path, config_issue, true);
         validate_configuration_path!(
             Path::new(&self.posts_path)
                 .join(&self.posts_layout)
                 .to_str()
                 .unwrap(),
             posts_layout,
-            config_issue
+            config_issue,
+            false
         );
         validate_configuration_slashes!(&self.blog_site_path, blog_site_path, config_issue);
         validate_configuration_slashes!(&self.images_site_path, images_site_path, config_issue);
