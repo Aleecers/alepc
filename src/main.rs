@@ -29,7 +29,7 @@ mod utils;
 use std::env::var;
 
 fn main() -> errors::Statuses<errors::ApcError> {
-    var("RUST_LOG").is_ok().then(|| pretty_env_logger::init());
+    var("RUST_LOG").is_ok().then(pretty_env_logger::init);
     let alepc_config = config::get_config();
     if let Ok(alepc_config) = alepc_config {
         // Will run `errors::Statuses::report`-> `errors::ApcError::report`
