@@ -209,12 +209,14 @@ impl Config {
         validate_configuration_slashes!(&self.images_site_path, images_site_path, config_issue);
         Ok(self)
     }
-    /// Write configuration file in config directory
+    /// Write configuration in `config_path`
     #[logfn(Debug)]
     #[logfn_inputs(Info)]
     pub fn write(self, config_path: &Path) -> ApcResult<Self> {
-        if !config_path.parent().unwrap().exists() {
-            fs::create_dir_all(config_path.parent().unwrap()).map_err(|err| {
+        let parent = config_path.parent();
+        if matches!(parent, Some(parent) if !parent.exists()) {
+            log::debug!("Create config parent: {:?}", parent);
+            fs::create_dir_all(parent.unwrap()).map_err(|err| {
                 log::error!("{:?}", err);
                 ApcError::FileSystem(err.to_string())
             })?
