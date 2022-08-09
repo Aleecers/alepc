@@ -23,18 +23,20 @@ use std::fs;
 use std::path::Path;
 
 /// Struct containing the post information
-#[derive(Debug)]
+#[derive(Debug, Educe)]
+#[educe(Default)]
 pub struct Post<'a> {
-    title: &'a str,
-    layout: &'a str,
-    slug: &'a str,
-    is_draft: bool,
-    description: &'a str,
-    tags: Vec<String>,
-    image_path: String,
-    date: DateTime<Local>,
-    date_modified: Option<DateTime<Local>>,
-    link: String,
+    pub title: &'a str,
+    pub layout: &'a str,
+    pub slug: &'a str,
+    pub is_draft: bool,
+    pub description: &'a str,
+    pub tags: Vec<String>,
+    pub image_path: String,
+    #[educe(Default(expression = "chrono::offset::Local::now()"))]
+    pub date: DateTime<Local>,
+    pub date_modified: Option<DateTime<Local>>,
+    pub link: String,
 }
 
 impl<'a> Post<'a> {
