@@ -26,5 +26,9 @@ strum = { version = "= 0.24.1", features = ["derive"] }
 thiserror = "= 1.0.31"
 url = { version = "= 2.2.2", features = ["serde"] }
 
+[dev-dependencies]
+serial_test = "= 0.8.0"
+test-case = "= 2.2.1"
+
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
