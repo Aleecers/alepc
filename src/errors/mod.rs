@@ -24,7 +24,7 @@ use thiserror::Error;
 
 pub use statuses::Statuses;
 /// Alepc errors
-#[derive(IntoStaticStr, Error, Debug)]
+#[derive(IntoStaticStr, Error, Debug, Clone)]
 pub enum ApcError {
     #[error("Cannot parse config file '{code}' in {position}")]
     ParseRon { code: ErrorCode, position: Position },
