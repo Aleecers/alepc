@@ -16,6 +16,7 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::config::Config;
+use crate::utils::helpers;
 use crate::utils::validators::{
     file_path_validator, is_valid_length, is_valid_tags, join_on_key_validator,
     join_str_validators, length_validator, tags_validator,
@@ -26,7 +27,7 @@ use requestty::{Answers, Question};
 /// Returns the post title question
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-fn post_title_question(config: &Config) -> Question {
+fn post_title_question(config: &'static Config) -> Question {
     Question::input("post_title")
         .message(&config.input_settings.title_message)
         // Validate when write the title ( title will be red if `is_valid_length` return false )
@@ -42,17 +43,14 @@ fn post_title_question(config: &Config) -> Question {
         ))
         .transform(|title, _, backend| write!(backend, "{}", title.trim()))
         // Run this question when user choice to create a new post
-        .when(|answer: &Answers| {
-            answer.get("action").unwrap().as_list_item().unwrap().text
-                == config.select_action.new_post_choice
-        })
+        .when(helpers::new_post(&config))
         .build()
 }
 
 /// Returns the post description question
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-fn post_description_question(config: &Config) -> Question {
+fn post_description_question(config: &'static Config) -> Question {
     Question::input("post_description")
         .message(&config.input_settings.description_message)
         // Validate when write the description ( description will be red if `is_valid_length` return false )
@@ -68,17 +66,14 @@ fn post_description_question(config: &Config) -> Question {
         ))
         .transform(|description, _, backend| write!(backend, "{}", description.trim()))
         // Run this question when user choice to create a new post
-        .when(|answer: &Answers| {
-            answer.get("action").unwrap().as_list_item().unwrap().text
-                == config.select_action.new_post_choice
-        })
+        .when(helpers::new_post(&config))
         .build()
 }
 
 /// Returns the psst tags question
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-fn post_tags_question(config: &Config) -> Question {
+fn post_tags_question(config: &'static Config) -> Question {
     Question::input("post_tags")
         .message(&config.input_settings.tags_message)
         .validate_on_key(is_valid_tags(
@@ -103,17 +98,14 @@ fn post_tags_question(config: &Config) -> Question {
                     .join(&format!("{} ", config.input_settings.separated_tags_by))
             )
         })
-        .when(|answer: &Answers| {
-            answer.get("action").unwrap().as_list_item().unwrap().text
-                == config.select_action.new_post_choice
-        })
+        .when(helpers::new_post(&config))
         .build()
 }
 
 /// Returns the post slug question
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-fn post_slug_question(config: &Config) -> Question {
+fn post_slug_question(config: &'static Config) -> Question {
     Question::input("post_slug")
         .message(&config.input_settings.slug_message)
         // Validate when write the slug ( slug will be red if `is_valid_length` return false )
@@ -140,34 +132,28 @@ fn post_slug_question(config: &Config) -> Question {
         ))
         .transform(|slug, _, backend| write!(backend, "{}", slug_updater(slug)))
         // Run this question when user choice to create a new post
-        .when(|answer: &Answers| {
-            answer.get("action").unwrap().as_list_item().unwrap().text
-                == config.select_action.new_post_choice
-        })
+        .when(helpers::new_post(&config))
         .build()
 }
 
 /// Returns the post image question
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-fn post_image_question(config: &Config) -> Question {
+fn post_image_question(config: &'static Config) -> Question {
     Question::input("post_image")
         .message(&config.input_settings.image_message)
         .validate_on_key(|str_path, answers| file_path_validator(false)(str_path, answers).is_ok())
         .validate(file_path_validator(false))
         .transform(|str_path, _, backend| write!(backend, "{}", full_path(str_path)))
         // Run this question when user choice to create a new post
-        .when(|answer: &Answers| {
-            answer.get("action").unwrap().as_list_item().unwrap().text
-                == config.select_action.new_post_choice
-        })
+        .when(helpers::new_post(&config))
         .build()
 }
 
 /// Return all properties questions of post
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-pub fn post_properties(config: &Config) -> Vec<Question> {
+pub fn post_properties(config: &'static Config) -> Vec<Question> {
     vec![
         post_title_question(config),
         post_description_question(config),

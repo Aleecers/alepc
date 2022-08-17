@@ -19,6 +19,7 @@
 extern crate educe;
 #[macro_use]
 extern crate log_derive;
+extern crate lazy_static;
 extern crate pretty_env_logger;
 
 mod app;
@@ -29,17 +30,18 @@ mod utils;
 #[cfg(test)]
 mod tests;
 
+use errors::{ApcError, Statuses};
+use lazy_static::lazy_static;
 use std::env::var;
 
-fn main() -> errors::Statuses<errors::ApcError> {
+lazy_static! {
+    static ref CONFIG: Result<config::Config, ApcError> = config::get_config();
+}
+
+fn main() -> Statuses<ApcError> {
     var("RUST_LOG").is_ok().then(pretty_env_logger::init);
-    let alepc_config = config::get_config();
-    if let Ok(alepc_config) = alepc_config {
-        // Will run `errors::Statuses::report`-> `errors::ApcError::report`
-        // if it's error else return `ExitCode::SUCCESS`
-        app::run(&alepc_config).into()
-    } else {
-        // Will run `errors::Statuses::report`-> `errors::ApcError::report`
-        alepc_config.into()
+    match CONFIG.as_ref() {
+        Ok(alepc_config) => app::run(alepc_config).into(),
+        Err(err) => Statuses::Failure(err.clone()),
     }
 }

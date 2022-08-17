@@ -34,7 +34,7 @@ const VERSION: &str = "0.1.0";
 /// Return the questions
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-fn questions(config: &Config) -> Vec<Question> {
+fn questions(config: &'static Config) -> Vec<Question> {
     let mut questions = vec![Question::select("action")
         .message(&config.select_action.select_action_message)
         .choices(vec![
@@ -104,7 +104,7 @@ pub fn post_from_answers<'a>(
 
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-pub fn run(config: &Config) -> ApcResult<()> {
+pub fn run(config: &'static Config) -> ApcResult<()> {
     let answers = prompt(questions(config)).map_err(|err| {
         log::error!("{:?}", err);
         ApcError::Requestty(err.to_string())
