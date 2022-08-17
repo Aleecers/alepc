@@ -24,3 +24,7 @@ pub fn new_post(config: &'static Config) -> impl Fn(&Answers) -> bool {
             == config.select_action.new_post_choice
     }
 }
+
+pub fn get_str_length(str_text: &str) -> usize {
+    str_text.trim().chars().count()
+}

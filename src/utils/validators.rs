@@ -15,15 +15,10 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use super::helpers;
 use crate::utils::tags_updater;
 use requestty::Answers;
 use std::path::Path;
-
-pub mod helper {
-    pub fn get_str_length(str_text: &str) -> usize {
-        str_text.trim().chars().count()
-    }
-}
 
 /// Length validator
 pub fn length_validator(
@@ -32,12 +27,12 @@ pub fn length_validator(
     maximum: u8,
 ) -> impl FnMut(&str, &Answers) -> Result<(), String> + '_ {
     move |value: &str, _| {
-        if helper::get_str_length(value) < (minimum as usize) {
+        if helpers::get_str_length(value) < (minimum as usize) {
             Err(format!(
                 "The length of {name} must be greater than {}",
                 minimum - 1
             ))
-        } else if helper::get_str_length(value) > (maximum as usize) {
+        } else if helpers::get_str_length(value) > (maximum as usize) {
             Err(format!(
                 "The length of {name} must be less than {}",
                 maximum + 1
