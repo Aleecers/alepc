@@ -26,6 +26,9 @@ mod config;
 mod errors;
 mod utils;
 
+#[cfg(test)]
+mod tests;
+
 use std::env::var;
 
 fn main() -> errors::Statuses<errors::ApcError> {
