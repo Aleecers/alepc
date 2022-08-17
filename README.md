@@ -12,15 +12,9 @@ CLI to create post template for [aleecers blog]
   <img src="https://img.shields.io/badge/Made%20with-Rust-orange.svg" alt="Rust">
 </a>
 <br>
-<a href="https://github.com/aleecers/alepc">
-  <img src="https://badge.fury.io/gh/theawiteb%2Finrs.svg" alt="version">
-</a>
-<a href="https://github.com/aleecers/alepc/issues?q=is%3Aissue+is%3Aopen+">
-  <img src="https://img.shields.io/github/issues/aleecers/alepc.svg" alt="issues-open">
-</a>
-<a href="https://github.com/aleecers/alepc/issues?q=is%3Aissue+is%3Aclosed+">
-  <img src="https://img.shields.io/github/issues-closed/aleecers/alepc.svg" alt="issues-closed">
-</a>
+<a href="https://crates.io/crates/alepc">
+    <img src="https://img.shields.io/crates/v/alepc.svg">
+  </a>
 <br>
 <a href="https://github.com/aleecers/alepc/actions/workflows/ci.yml">
   <img src="https://github.com/aleecers/alepc/actions/workflows/ci.yml/badge.svg" alt="Continuous Integration">
