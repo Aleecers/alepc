@@ -16,6 +16,7 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 mod creator;
+pub mod helpers;
 pub mod questions;
 pub mod validators;
 
