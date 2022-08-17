@@ -39,7 +39,7 @@ fn questions(config: &Config) -> Vec<Question> {
         .message(&config.select_action.select_action_message)
         .choices(vec![
             &config.select_action.new_post_choice,
-            &config.select_action.update_modified_post_date,
+            &config.select_action.update_existing_post,
             &config.select_action.version_choice,
         ])
         .default(0)

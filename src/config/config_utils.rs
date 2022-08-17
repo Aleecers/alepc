@@ -91,9 +91,9 @@ pub struct SelectAction {
     #[educe(Default = "Create a new post ✍")]
     /// Create a new post choice in select
     pub new_post_choice: String,
-    #[educe(Default = "Update modified date 📅")]
-    /// Update modified post date choice
-    pub update_modified_post_date: String,
+    #[educe(Default = "Update existing post 🖌️")]
+    /// Update an existing post choice
+    pub update_existing_post: String,
     #[educe(Default = "Alepc Version ⚙")]
     /// Version choice
     pub version_choice: String,
