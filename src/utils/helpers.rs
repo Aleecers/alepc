@@ -28,3 +28,27 @@ pub fn new_post(config: &'static Config) -> impl Fn(&Answers) -> bool {
 pub fn get_str_length(str_text: &str) -> usize {
     str_text.trim().chars().count()
 }
+
+/// Join tow validator
+pub fn join_str_validators<'a>(
+    mut left: impl FnMut(&str, &Answers) -> Result<(), String> + 'a,
+    mut right: impl FnMut(&str, &Answers) -> Result<(), String> + 'a,
+) -> impl FnMut(&str, &Answers) -> Result<(), String> + 'a {
+    move |str_value: &str, answers: &Answers| {
+        if let Err(err) = left(str_value, answers) {
+            Err(err)
+        } else if let Err(err) = right(str_value, answers) {
+            Err(err)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+/// Join tow on key validator
+pub fn join_on_key_validator<'a>(
+    mut left: impl FnMut(&str, &Answers) -> bool + 'a,
+    mut right: impl FnMut(&str, &Answers) -> bool + 'a,
+) -> impl FnMut(&str, &Answers) -> bool + 'a {
+    move |str_value, answers| left(str_value, answers) && right(str_value, answers)
+}
