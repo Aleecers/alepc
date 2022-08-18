@@ -16,7 +16,7 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use super::helpers;
-use crate::utils::tags_updater;
+use crate::{config::Config, utils::tags_updater};
 use requestty::Answers;
 use std::path::Path;
 
@@ -44,39 +44,33 @@ pub fn length_validator(
 }
 
 /// Tags validator
-pub fn tags_validator(
-    minimum_tags: u8,
-    maximum_tags: u8,
-    minimum_tag_length: u8,
-    maximum_tag_length: u8,
-    separated_by: char,
-) -> impl FnMut(&str, &Answers) -> Result<(), String> {
+pub fn tags_validator(config: &'static Config) -> impl FnMut(&str, &Answers) -> Result<(), String> {
     move |str_tags: &str, _| {
-        if minimum_tags != 0 {
-            let tags = tags_updater(str_tags, separated_by);
-            if tags.len() < (minimum_tags as usize) {
+        if config.input_settings.minimum_tags_count != 0 {
+            let tags = tags_updater(str_tags, config.input_settings.separated_tags_by);
+            if tags.len() < (config.input_settings.minimum_tags_count as usize) {
                 return Err(format!(
                     "The number of tags must be greater than {}",
-                    minimum_tags - 1
+                    config.input_settings.minimum_tags_count - 1
                 ));
-            } else if tags.len() > (maximum_tags as usize) {
+            } else if tags.len() > (config.input_settings.maximum_tags_count as usize) {
                 return Err(format!(
                     "The number of tags must be less than {}",
-                    maximum_tags + 1
+                    config.input_settings.maximum_tags_count + 1
                 ));
-            } else if let Some(invalid_tag) = tags
-                .iter()
-                .find(|tag| tag.chars().count() < (minimum_tag_length as usize))
-            {
+            } else if let Some(invalid_tag) = tags.iter().find(|tag| {
+                tag.chars().count() < (config.input_settings.minimum_single_tag_length as usize)
+            }) {
                 return Err(format!(
-                    "'{invalid_tag}' It's short, the minimum is {minimum_tag_length} characters"
+                    "'{invalid_tag}' It's short, the minimum is {} characters",
+                    config.input_settings.minimum_single_tag_length
                 ));
-            } else if let Some(invalid_tag) = tags
-                .iter()
-                .find(|tag| tag.chars().count() > (maximum_tag_length as usize))
-            {
+            } else if let Some(invalid_tag) = tags.iter().find(|tag| {
+                tag.chars().count() > (config.input_settings.maximum_single_tag_length as usize)
+            }) {
                 return Err(format!(
-                    "'{invalid_tag}' it's long, the maximum is {maximum_tag_length} characters"
+                    "'{invalid_tag}' it's long, the maximum is {} characters",
+                    config.input_settings.maximum_single_tag_length
                 ));
             }
         }
@@ -106,23 +100,8 @@ pub fn file_path_validator<'a>(
 }
 
 /// Return if the tags is valid tags
-pub fn is_valid_tags<'a>(
-    minimum_tags: u8,
-    maximum_tags: u8,
-    minimum_tag_length: u8,
-    maximum_tag_length: u8,
-    separated_by: char,
-) -> impl FnMut(&str, &Answers) -> bool + 'a {
-    move |str_tags: &str, answers: &Answers| {
-        tags_validator(
-            minimum_tags,
-            maximum_tags,
-            minimum_tag_length,
-            maximum_tag_length,
-            separated_by,
-        )(str_tags, answers)
-        .is_ok()
-    }
+pub fn is_valid_tags<'a>(config: &'static Config) -> impl FnMut(&str, &Answers) -> bool + 'a {
+    move |str_tags, answers| tags_validator(config)(str_tags, answers).is_ok()
 }
 
 /// Return if the length of value is valid
@@ -130,28 +109,4 @@ pub fn is_valid_length<'a>(minimum: u8, maximum: u8) -> impl FnMut(&str, &Answer
     move |value: &str, answers: &Answers| {
         length_validator("_", minimum, maximum)(value, answers).is_ok()
     }
-}
-
-/// Join tow validator
-pub fn join_str_validators<'a>(
-    mut left: impl FnMut(&str, &Answers) -> Result<(), String> + 'a,
-    mut right: impl FnMut(&str, &Answers) -> Result<(), String> + 'a,
-) -> impl FnMut(&str, &Answers) -> Result<(), String> + 'a {
-    move |str_value: &str, answers: &Answers| {
-        if let Err(err) = left(str_value, answers) {
-            Err(err)
-        } else if let Err(err) = right(str_value, answers) {
-            Err(err)
-        } else {
-            Ok(())
-        }
-    }
-}
-
-/// Join tow on key validator
-pub fn join_on_key_validator<'a>(
-    mut left: impl FnMut(&str, &Answers) -> bool + 'a,
-    mut right: impl FnMut(&str, &Answers) -> bool + 'a,
-) -> impl FnMut(&str, &Answers) -> bool + 'a {
-    move |str_value, answers| left(str_value, answers) && right(str_value, answers)
 }

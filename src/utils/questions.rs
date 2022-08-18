@@ -15,13 +15,12 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::config::Config;
-use crate::utils::helpers;
-use crate::utils::validators::{
-    file_path_validator, is_valid_length, is_valid_tags, join_on_key_validator,
-    join_str_validators, length_validator, tags_validator,
+use super::helpers;
+use super::validators::{
+    file_path_validator, is_valid_length, is_valid_tags, length_validator, tags_validator,
 };
-use crate::utils::{full_path, slug_updater, tags_updater, to_post_path};
+use super::{full_path, slug_updater, tags_updater, to_post_path};
+use crate::config::Config;
 use requestty::{Answers, Question};
 
 /// Returns the post title question
@@ -76,20 +75,8 @@ fn post_description_question(config: &'static Config) -> Question {
 fn post_tags_question(config: &'static Config) -> Question {
     Question::input("post_tags")
         .message(&config.input_settings.tags_message)
-        .validate_on_key(is_valid_tags(
-            config.input_settings.minimum_tags_count,
-            config.input_settings.maximum_tags_count,
-            config.input_settings.minimum_single_tag_length,
-            config.input_settings.maximum_single_tag_length,
-            config.input_settings.separated_tags_by,
-        ))
-        .validate(tags_validator(
-            config.input_settings.minimum_tags_count,
-            config.input_settings.maximum_tags_count,
-            config.input_settings.minimum_single_tag_length,
-            config.input_settings.maximum_single_tag_length,
-            config.input_settings.separated_tags_by,
-        ))
+        .validate_on_key(is_valid_tags(config))
+        .validate(tags_validator(config))
         .transform(|str_tags, _, backend| {
             write!(
                 backend,
@@ -109,7 +96,7 @@ fn post_slug_question(config: &'static Config) -> Question {
     Question::input("post_slug")
         .message(&config.input_settings.slug_message)
         // Validate when write the slug ( slug will be red if `is_valid_length` return false )
-        .validate_on_key(join_on_key_validator(
+        .validate_on_key(helpers::join_on_key_validator(
             is_valid_length(
                 config.input_settings.minimum_slug_length,
                 config.input_settings.maximum_slug_length,
@@ -120,7 +107,7 @@ fn post_slug_question(config: &'static Config) -> Question {
             },
         ))
         // Validate if slug already exists, and slug length
-        .validate(join_str_validators(
+        .validate(helpers::join_str_validators(
             length_validator(
                 "post description",
                 config.input_settings.minimum_slug_length,
