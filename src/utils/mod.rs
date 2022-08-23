@@ -15,12 +15,12 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-mod creator;
 pub mod helpers;
+mod post;
 pub mod questions;
 pub mod validators;
 
-pub use creator::*;
+pub use post::*;
 use std::ffi::OsStr;
 
 use crate::config::Config;
