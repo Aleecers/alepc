@@ -42,7 +42,7 @@ fn post_title_question(config: &'static Config) -> Question {
         ))
         .transform(|title, _, backend| write!(backend, "{}", title.trim()))
         // Run this question when user choice to create a new post
-        .when(helpers::new_post(&config))
+        .when(helpers::new_post(config))
         .build()
 }
 
@@ -65,7 +65,7 @@ fn post_description_question(config: &'static Config) -> Question {
         ))
         .transform(|description, _, backend| write!(backend, "{}", description.trim()))
         // Run this question when user choice to create a new post
-        .when(helpers::new_post(&config))
+        .when(helpers::new_post(config))
         .build()
 }
 
@@ -85,7 +85,7 @@ fn post_tags_question(config: &'static Config) -> Question {
                     .join(&format!("{} ", config.input_settings.separated_tags_by))
             )
         })
-        .when(helpers::new_post(&config))
+        .when(helpers::new_post(config))
         .build()
 }
 
@@ -119,7 +119,7 @@ fn post_slug_question(config: &'static Config) -> Question {
         ))
         .transform(|slug, _, backend| write!(backend, "{}", slug_updater(slug)))
         // Run this question when user choice to create a new post
-        .when(helpers::new_post(&config))
+        .when(helpers::new_post(config))
         .build()
 }
 
@@ -133,7 +133,7 @@ fn post_image_question(config: &'static Config) -> Question {
         .validate(file_path_validator(false))
         .transform(|str_path, _, backend| write!(backend, "{}", full_path(str_path)))
         // Run this question when user choice to create a new post
-        .when(helpers::new_post(&config))
+        .when(helpers::new_post(config))
         .build()
 }
 
