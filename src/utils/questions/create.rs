@@ -15,12 +15,12 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use super::helpers;
-use super::validators::{
+use crate::config::Config;
+use crate::utils::helpers;
+use crate::utils::validators::{
     file_path_validator, is_valid_length, is_valid_tags, length_validator, tags_validator,
 };
-use super::{full_path, slug_updater, tags_updater, to_post_path};
-use crate::config::Config;
+use crate::utils::{full_path, slug_updater, tags_updater, to_post_path};
 use requestty::{Answers, Question};
 
 /// Returns the post title question

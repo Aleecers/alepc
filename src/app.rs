@@ -18,7 +18,7 @@
 use crate::config::Config;
 use crate::errors::{ApcError, ApcResult};
 use crate::utils;
-use crate::utils::questions::post_properties;
+use crate::utils::questions::create::post_properties;
 use crate::utils::Post;
 use requestty::{prompt, Answers, Question};
 
