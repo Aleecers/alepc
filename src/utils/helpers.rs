@@ -18,7 +18,7 @@
 use crate::config::Config;
 use requestty::Answers;
 
-pub fn new_post(config: &'static Config) -> impl Fn(&Answers) -> bool {
+pub fn is_new_post(config: &'static Config) -> impl Fn(&Answers) -> bool {
     move |answers| {
         answers.get("action").unwrap().as_list_item().unwrap().text
             == config.select_action.new_post_choice
