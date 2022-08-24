@@ -28,17 +28,17 @@ use requestty::{Answers, Question};
 #[logfn_inputs(Info)]
 fn post_title_question(config: &'static Config) -> Question {
     Question::input("post_title")
-        .message(&config.input_settings.title_message)
+        .message(&config.create_post_settings.title_message)
         // Validate when write the title ( title will be red if `is_valid_length` return false )
         .validate_on_key(is_valid_length(
-            config.input_settings.minimum_title_length,
-            config.input_settings.maximum_title_length,
+            config.create_post_settings.minimum_title_length,
+            config.create_post_settings.maximum_title_length,
         ))
         // Validate when pressing Enter
         .validate(length_validator(
             "post title",
-            config.input_settings.minimum_title_length,
-            config.input_settings.maximum_title_length,
+            config.create_post_settings.minimum_title_length,
+            config.create_post_settings.maximum_title_length,
         ))
         .transform(|title, _, backend| write!(backend, "{}", title.trim()))
         // Run this question when user choice to create a new post
@@ -51,17 +51,17 @@ fn post_title_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_description_question(config: &'static Config) -> Question {
     Question::input("post_description")
-        .message(&config.input_settings.description_message)
+        .message(&config.create_post_settings.description_message)
         // Validate when write the description ( description will be red if `is_valid_length` return false )
         .validate_on_key(is_valid_length(
-            config.input_settings.minimum_description_length,
-            config.input_settings.maximum_description_length,
+            config.create_post_settings.minimum_description_length,
+            config.create_post_settings.maximum_description_length,
         ))
         // Validate when pressing Enter
         .validate(length_validator(
             "post description",
-            config.input_settings.minimum_description_length,
-            config.input_settings.maximum_description_length,
+            config.create_post_settings.minimum_description_length,
+            config.create_post_settings.maximum_description_length,
         ))
         .transform(|description, _, backend| write!(backend, "{}", description.trim()))
         // Run this question when user choice to create a new post
@@ -74,15 +74,16 @@ fn post_description_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_tags_question(config: &'static Config) -> Question {
     Question::input("post_tags")
-        .message(&config.input_settings.tags_message)
+        .message(&config.create_post_settings.tags_message)
         .validate_on_key(is_valid_tags(config))
         .validate(tags_validator(config))
         .transform(|str_tags, _, backend| {
             write!(
                 backend,
                 "{}",
-                tags_updater(str_tags, config.input_settings.separated_tags_by)
-                    .join(&format!("{} ", config.input_settings.separated_tags_by))
+                tags_updater(str_tags, config.create_post_settings.separated_tags_by).join(
+                    &format!("{} ", config.create_post_settings.separated_tags_by)
+                )
             )
         })
         .when(helpers::is_new_post(config))
@@ -94,12 +95,12 @@ fn post_tags_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_slug_question(config: &'static Config) -> Question {
     Question::input("post_slug")
-        .message(&config.input_settings.slug_message)
+        .message(&config.create_post_settings.slug_message)
         // Validate when write the slug ( slug will be red if `is_valid_length` return false )
         .validate_on_key(helpers::join_on_key_validator(
             is_valid_length(
-                config.input_settings.minimum_slug_length,
-                config.input_settings.maximum_slug_length,
+                config.create_post_settings.minimum_slug_length,
+                config.create_post_settings.maximum_slug_length,
             ),
             |slug, answers| {
                 file_path_validator(true)(&to_post_path(config, &slug_updater(slug)), answers)
@@ -110,8 +111,8 @@ fn post_slug_question(config: &'static Config) -> Question {
         .validate(helpers::join_str_validators(
             length_validator(
                 "post description",
-                config.input_settings.minimum_slug_length,
-                config.input_settings.maximum_slug_length,
+                config.create_post_settings.minimum_slug_length,
+                config.create_post_settings.maximum_slug_length,
             ),
             |slug, answers: &Answers| {
                 file_path_validator(true)(&to_post_path(config, slug), answers)
@@ -128,7 +129,7 @@ fn post_slug_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_image_question(config: &'static Config) -> Question {
     Question::input("post_image")
-        .message(&config.input_settings.image_message)
+        .message(&config.create_post_settings.image_message)
         .validate_on_key(|str_path, answers| file_path_validator(false)(str_path, answers).is_ok())
         .validate(file_path_validator(false))
         .transform(|str_path, _, backend| write!(backend, "{}", full_path(str_path)))

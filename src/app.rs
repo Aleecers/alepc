@@ -79,7 +79,7 @@ pub fn post_from_answers<'a>(
                     .trim(),
                 utils::tags_updater(
                     answers.get("post_tags").unwrap().as_string().unwrap(),
-                    apc_config.input_settings.separated_tags_by,
+                    apc_config.create_post_settings.separated_tags_by,
                 ),
                 utils::copy_image(
                     apc_config,

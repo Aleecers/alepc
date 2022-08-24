@@ -46,31 +46,33 @@ pub fn length_validator(
 /// Tags validator
 pub fn tags_validator(config: &'static Config) -> impl FnMut(&str, &Answers) -> Result<(), String> {
     move |str_tags: &str, _| {
-        if config.input_settings.minimum_tags_count != 0 {
-            let tags = tags_updater(str_tags, config.input_settings.separated_tags_by);
-            if tags.len() < (config.input_settings.minimum_tags_count as usize) {
+        if config.create_post_settings.minimum_tags_count != 0 {
+            let tags = tags_updater(str_tags, config.create_post_settings.separated_tags_by);
+            if tags.len() < (config.create_post_settings.minimum_tags_count as usize) {
                 return Err(format!(
                     "The number of tags must be greater than {}",
-                    config.input_settings.minimum_tags_count - 1
+                    config.create_post_settings.minimum_tags_count - 1
                 ));
-            } else if tags.len() > (config.input_settings.maximum_tags_count as usize) {
+            } else if tags.len() > (config.create_post_settings.maximum_tags_count as usize) {
                 return Err(format!(
                     "The number of tags must be less than {}",
-                    config.input_settings.maximum_tags_count + 1
+                    config.create_post_settings.maximum_tags_count + 1
                 ));
             } else if let Some(invalid_tag) = tags.iter().find(|tag| {
-                tag.chars().count() < (config.input_settings.minimum_single_tag_length as usize)
+                tag.chars().count()
+                    < (config.create_post_settings.minimum_single_tag_length as usize)
             }) {
                 return Err(format!(
                     "'{invalid_tag}' It's short, the minimum is {} characters",
-                    config.input_settings.minimum_single_tag_length
+                    config.create_post_settings.minimum_single_tag_length
                 ));
             } else if let Some(invalid_tag) = tags.iter().find(|tag| {
-                tag.chars().count() > (config.input_settings.maximum_single_tag_length as usize)
+                tag.chars().count()
+                    > (config.create_post_settings.maximum_single_tag_length as usize)
             }) {
                 return Err(format!(
                     "'{invalid_tag}' it's long, the maximum is {} characters",
-                    config.input_settings.maximum_single_tag_length
+                    config.create_post_settings.maximum_single_tag_length
                 ));
             }
         }

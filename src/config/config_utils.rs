@@ -102,7 +102,7 @@ pub struct SelectAction {
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
 /// Inputs setting structure
-pub struct InputSettings {
+pub struct CreatePostSettings {
     #[educe(Default = 7)]
     /// Minimum length of post title
     pub minimum_title_length: u8,
@@ -185,7 +185,7 @@ pub struct Config {
     /// Select action structure
     pub select_action: SelectAction,
     /// Inputs setting
-    pub input_settings: InputSettings,
+    pub create_post_settings: CreatePostSettings,
 }
 
 impl Config {
