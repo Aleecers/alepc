@@ -12,7 +12,7 @@ keywords = ["helper", "CLI"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-chrono = "= 0.4.19"
+chrono = "= 0.4.22"
 colored = "= 2.0.0"
 directories = "= 4.0.1"
 educe = { version = "0.4.19", features = ["Default"] }
@@ -20,7 +20,8 @@ lazy_static = "= 1.4.0"
 log = "= 0.4.17"
 log-derive = "= 0.4.1"
 pretty_env_logger = "= 0.4.0"
-requestty = "= 0.4.1"
+regex = "1.6.0"
+requestty = { git = "https://github.com/Lutetium-Vanadium/requestty.git", rev = "550ee1d" }
 ron = "= 0.7.1"
 serde = { version = "= 1.0.140", features = ["derive"] }
 strum = { version = "= 0.24.1", features = ["derive"] }

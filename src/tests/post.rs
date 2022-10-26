@@ -31,7 +31,7 @@ fn test_write_post(posts_path: &str, slug: &str) {
         ..Default::default()
     };
     let post = Post {
-        slug,
+        slug: slug.to_owned(),
         ..Default::default()
     };
     let filename = Path::new(posts_path).join(slug).with_extension("md");
