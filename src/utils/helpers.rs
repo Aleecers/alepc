@@ -18,7 +18,7 @@
 use crate::config::Config;
 use requestty::{prompt::Backend, Answers};
 
-use super::{full_path, to_post_path, PostProperties};
+use super::{full_path, replace_tilde_with_home_dir, to_post_path, PostProperties};
 
 /// Return true if the action is to create new post
 #[logfn_inputs(Info)]
@@ -60,7 +60,13 @@ pub fn is_show_all_action(config: &'static Config) -> impl Fn(&Answers) -> bool 
 /// Full path tranform, will panic if the path dose't exiest
 pub fn full_path_transform() -> impl FnMut(&str, &Answers, &mut dyn Backend) -> std::io::Result<()>
 {
-    move |str_path, _, backend| write!(backend, "{}", full_path(str_path))
+    move |str_path, _, backend| {
+        write!(
+            backend,
+            "{}",
+            full_path(&replace_tilde_with_home_dir(str_path))
+        )
+    }
 }
 
 /// Return a tags transform

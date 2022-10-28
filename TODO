@@ -1,0 +1,39 @@
+Bugs:
+  ✔ slug path, when enter the slug and transform change it to path @done(22-10-21 14:45)
+
+  In `show_all` action:
+    ✔ Empty tranform when enter a new post image @done(22-10-21 14:47)
+    ✔ Date error @done(22-10-21 14:47)
+    ✔ The draft status are update when you say no @done(22-10-21 14:47)
+  
+  When update the draft status:
+    ✔ Path of post image @done(22-10-21 14:48)
+    ✔ Date, it's change to current date @done(22-10-21 14:48)
+    ✔ Modify date, it's change to current date @done(22-10-21 14:48)
+  
+  ⬜ Select image path dose't support `~` #23 
+  ✘ Mabye bug, in new version when update the slug for post that have alot of images @cancelled(22-10-26 18:46)
+  ✔ Fix error message when enter valid post slug (in modify) @done(22-10-26 19:00)
+  ⬜ When press enter in `New slug` input will terminate
+
+TODOS:
+  Update the post in the disk #7:
+    Slug:
+      ✔ Post name @done(22-10-25 15:03)
+      ✔ Post link @done(22-10-25 15:03)
+      ✔ Image folder @done(22-10-25 15:03)
+      ✔ Image name @done(22-10-25 15:03)
+      Checks:
+        ✔ Posts name (the slug is not already existing) @done(22-10-26 18:29)
+    Images:
+      ✔ Move all images with new slug name (if slug was updated) @done(22-10-26 17:14)
+      ✔ Make sure that post header with new slug name (if slug was updated) @done(22-10-26 15:57)
+    ✔ Write the new propertyis @done(22-10-26 15:58)
+  Autocomplete #8:
+    ⬜ For post slug (on update)
+    ⬜ For post image (on update)
+    ⬜ For post image (on create)
+  Other:
+    ⬜ Update version action #22
+    ⬜ Refactor config file #20
+    ✔ Check if image starts with image site path @done(22-10-26 19:55)

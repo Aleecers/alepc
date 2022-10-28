@@ -16,9 +16,12 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use super::{helpers, to_post_path};
-use crate::{config::Config, utils::tags_updater};
+use crate::{
+    config::Config,
+    utils::{replace_tilde_with_home_dir, tags_updater},
+};
 use requestty::Answers;
-use std::path::Path;
+use std::path::PathBuf;
 
 /// Length validator
 pub fn length_validator(
@@ -103,17 +106,15 @@ pub fn tags_validator(config: &'static Config) -> impl FnMut(&str, &Answers) -> 
 /// Make `is_exist` true if you want error when the file are existing
 pub fn file_path_validator(is_exist: bool) -> impl FnMut(&str, &Answers) -> Result<(), String> {
     move |str_path, _| {
-        let path = Path::new(str_path);
+        // Replace '~' with the home directory
+        let path = PathBuf::from(replace_tilde_with_home_dir(str_path));
         if path.exists() && !path.is_file() {
-            return Err(format!("'{str_path}' is not a file"));
+            return Err(format!("'{}' is not a file", path.display()));
         }
         if is_exist && path.exists() {
-            return Err(format!(
-                "'{}' is already exists",
-                path.file_name().unwrap().to_str().unwrap_or(str_path)
-            ));
+            return Err(format!("'{}' is already exists", path.display()));
         } else if !is_exist && !path.exists() {
-            return Err(format!("No such file named '{str_path}'"));
+            return Err(format!("'{}' is not exists", path.display()));
         }
         Ok(())
     }
