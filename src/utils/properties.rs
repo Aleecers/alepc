@@ -87,44 +87,6 @@ impl From<&Answers> for ModifyStatus {
     }
 }
 
-impl TryFrom<&Answers> for Props {
-    type Error = ApcError;
-
-    #[logfn_inputs(Info)]
-    #[logfn(Debug)]
-    fn try_from(answers: &Answers) -> Result<Self, Self::Error> {
-        let config = CONFIG.as_ref().unwrap();
-        let status = ModifyStatus::from(answers);
-        let post_path =
-            get_modifing_post(config, answers).expect("The action should be a `Modify` action");
-        if status.draft || status.date {
-            let mut post = Post::from_file(config, &post_path)?;
-            if status.draft {
-                post.is_draft = !post.is_draft;
-            };
-            post.try_into()
-        } else {
-            // Means is `show_all` action
-            Self::try_new(
-                slug_updater(&PostProperties::Slug.str_from_answers(answers)?),
-                PostProperties::Title.str_from_answers(answers)?,
-                PostProperties::Description.str_from_answers(answers)?,
-                PostProperties::Image.str_from_answers(answers)?,
-                tags_updater(
-                    &PostProperties::Tags.str_from_answers(answers)?,
-                    config.create_post_settings.separated_tags_by,
-                ),
-                parse_bool(&PostProperties::Draft.str_from_answers(answers)?)?,
-                parse_str_date(
-                    &PostProperties::Date.from_file(&post_path)?,
-                    &config.date_format,
-                )?,
-                chrono::offset::Local::now(),
-            )
-        }
-    }
-}
-
 pub trait ExtractProp<'a> {
     type Output;
     type NameType: Debug;
@@ -195,7 +157,53 @@ impl TryFrom<Post> for Props {
 }
 
 impl Props {
-    /// Create a new instace
+    /// Create new [`Props`] instance
+    /// ### Arguments
+    /// * `slug` - Slug of the post
+    /// * `title` - Title of the post
+    /// * `desctiption` - Description of the post
+    /// * `image_path` - Image path of the post
+    /// * `tags` - Tags of the post
+    /// * `draft` - Draft status of the post
+    /// * `date` - Date of the post
+    #[logfn_inputs(Info)]
+    #[logfn(Debug)]
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        slug: String,
+        title: String,
+        desctiption: String,
+        image_path: String,
+        tags: Vec<String>,
+        draft: bool,
+        date: DateTime<Local>,
+        modified_date: DateTime<Local>,
+    ) -> Self {
+        Self {
+            slug,
+            title,
+            desctiption,
+            image_path,
+            tags,
+            draft,
+            date,
+            modified_date,
+        }
+    }
+
+    /// Try to create new [`Props`] instance.
+    /// ### Errors
+    /// - If the `image_site_path` doesn't starts with `config.image_site_path`
+    /// - If the image doesn't exist
+    /// ### Arguments
+    /// - `slug` - The slug of the post
+    /// - `title` - The title of the post
+    /// - `desctiption` - The description of the post
+    /// - `image_site_path` - The path of the image in the site
+    /// - `tags` - The tags of the post
+    /// - `draft` - The draft status of the post
+    /// - `date` - The creation date of the post
+    /// - `modified_date` - The last modified date of the post
     #[logfn_inputs(Info)]
     #[logfn(Debug)]
     #[allow(clippy::too_many_arguments)]
@@ -226,8 +234,8 @@ impl Props {
             )));
         }
 
-        Ok(Self {
-            slug: slug.clone(),
+        Ok(Self::new(
+            slug.clone(),
             title,
             desctiption,
             image_path,
@@ -235,7 +243,57 @@ impl Props {
             draft,
             date,
             modified_date,
-        })
+        ))
+    }
+
+    /// Return modified props from answers
+    /// ### Panics
+    /// * If the action is not `show_all` action
+    /// ### Errors
+    /// * If image path doesn't exist
+    /// ### Arguments
+    /// * `answers` - Ref [`Answers`] from user
+    pub fn modified_from_answers(answers: &Answers) -> ApcResult<Self> {
+        let config = CONFIG.as_ref().unwrap();
+        let status = ModifyStatus::from(answers);
+        let post_path =
+            get_modifing_post(config, answers).expect("The action should be a `Modify` action");
+        if status.draft || status.date {
+            let mut post = Post::from_file(config, &post_path)?;
+            if status.draft {
+                post.is_draft = !post.is_draft;
+            };
+            post.try_into()
+        } else {
+            // Means is `show_all` action
+
+            // Get image path from answers
+            let image_path = PostProperties::Image.str_from_answers(answers)?;
+            // Check if image path exist
+            if !Path::new(&image_path).exists() {
+                return Err(ApcError::Validation(format!(
+                    "The post image doesn't exist: {}",
+                    image_path
+                )));
+            }
+
+            Ok(Self::new(
+                slug_updater(&PostProperties::Slug.str_from_answers(answers)?),
+                PostProperties::Title.str_from_answers(answers)?,
+                PostProperties::Description.str_from_answers(answers)?,
+                image_path,
+                tags_updater(
+                    &PostProperties::Tags.str_from_answers(answers)?,
+                    config.create_post_settings.separated_tags_by,
+                ),
+                parse_bool(&PostProperties::Draft.str_from_answers(answers)?)?,
+                parse_str_date(
+                    &PostProperties::Date.from_file(&post_path)?,
+                    &config.date_format,
+                )?,
+                chrono::offset::Local::now(),
+            ))
+        }
     }
 
     /// Parse a props from str
