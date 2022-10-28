@@ -102,7 +102,7 @@ pub struct SelectAction {
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
 /// Inputs setting structure
-pub struct InputSettings {
+pub struct CreatePostSettings {
     #[educe(Default = 7)]
     /// Minimum length of post title
     pub minimum_title_length: u8,
@@ -159,6 +159,47 @@ pub struct InputSettings {
 
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
+pub struct ModifyPostSettings {
+    /// The question of post name
+    #[educe(Default = "What's the post you want to modify it (Write the slug)")]
+    pub post_name_question: String,
+    /// Choice modify action
+    #[educe(Default = "What do you want to update?")]
+    pub choice_action: String,
+    /// Update date question
+    #[educe(Default = "Update modified date")]
+    pub update_the_date_question: String,
+    /// Update draft status question ( Will add the currently status in the end)
+    #[educe(Default = "Update draft status")]
+    pub update_draft_status_question: String,
+    /// Show all fields to update it question
+    #[educe(Default = "Show all")]
+    pub show_all_question: String,
+    /// New post slug question (Wheen show_all)
+    #[educe(Default = "New post slug")]
+    pub new_post_slug: String,
+    /// New post title question (Wheen show_all)
+    #[educe(Default = "New post title")]
+    pub new_post_title: String,
+    /// New post descripation question (Wheen show_all)
+    #[educe(Default = "New post description")]
+    pub new_post_descrioption: String,
+    /// New post image question (Wheen show_all)
+    #[educe(Default = "New post image")]
+    pub new_post_image: String,
+    /// New post tags question (Wheen show_all)
+    #[educe(Default = "New post tags")]
+    pub new_post_tags: String,
+    /// New post draft status question (Wheen show_all)
+    #[educe(Default = "Do you want to change draft status?")]
+    pub new_post_draft: String,
+    /// Message to keep old value
+    #[educe(Default = "Press enter to keep it 🤏")]
+    pub keep_old_value_message: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Educe)]
+#[educe(Default)]
 /// Config structure for Alepc
 pub struct Config {
     #[educe(Default = "../Aleecers.github.io/src/pages/blog/")]
@@ -184,8 +225,10 @@ pub struct Config {
     pub date_format: String,
     /// Select action structure
     pub select_action: SelectAction,
-    /// Inputs setting
-    pub input_settings: InputSettings,
+    /// Creat post setting
+    pub create_post_settings: CreatePostSettings,
+    /// Modify post setting
+    pub modify_post_settings: ModifyPostSettings,
 }
 
 impl Config {

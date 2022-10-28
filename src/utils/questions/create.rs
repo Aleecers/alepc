@@ -16,32 +16,19 @@
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::config::Config;
-use crate::utils::helpers;
-use crate::utils::validators::{
-    file_path_validator, is_valid_length, is_valid_tags, length_validator, tags_validator,
-};
-use crate::utils::{full_path, slug_updater, tags_updater, to_post_path};
-use requestty::{Answers, Question};
+use crate::utils::slug_updater;
+use crate::utils::{helpers, validators};
+use requestty::Question;
 
 /// Returns the post title question
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
 fn post_title_question(config: &'static Config) -> Question {
     Question::input("post_title")
-        .message(&config.input_settings.title_message)
-        // Validate when write the title ( title will be red if `is_valid_length` return false )
-        .validate_on_key(is_valid_length(
-            config.input_settings.minimum_title_length,
-            config.input_settings.maximum_title_length,
-        ))
-        // Validate when pressing Enter
-        .validate(length_validator(
-            "post title",
-            config.input_settings.minimum_title_length,
-            config.input_settings.maximum_title_length,
-        ))
+        .message(&config.create_post_settings.title_message)
+        .validate_on_key(validators::is_valid_title_length(config))
+        .validate(validators::title_length(config))
         .transform(|title, _, backend| write!(backend, "{}", title.trim()))
-        // Run this question when user choice to create a new post
         .when(helpers::is_new_post(config))
         .build()
 }
@@ -51,20 +38,10 @@ fn post_title_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_description_question(config: &'static Config) -> Question {
     Question::input("post_description")
-        .message(&config.input_settings.description_message)
-        // Validate when write the description ( description will be red if `is_valid_length` return false )
-        .validate_on_key(is_valid_length(
-            config.input_settings.minimum_description_length,
-            config.input_settings.maximum_description_length,
-        ))
-        // Validate when pressing Enter
-        .validate(length_validator(
-            "post description",
-            config.input_settings.minimum_description_length,
-            config.input_settings.maximum_description_length,
-        ))
+        .message(&config.create_post_settings.description_message)
+        .validate_on_key(validators::is_valid_description_length(config))
+        .validate(validators::description_length(config))
         .transform(|description, _, backend| write!(backend, "{}", description.trim()))
-        // Run this question when user choice to create a new post
         .when(helpers::is_new_post(config))
         .build()
 }
@@ -74,17 +51,10 @@ fn post_description_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_tags_question(config: &'static Config) -> Question {
     Question::input("post_tags")
-        .message(&config.input_settings.tags_message)
-        .validate_on_key(is_valid_tags(config))
-        .validate(tags_validator(config))
-        .transform(|str_tags, _, backend| {
-            write!(
-                backend,
-                "{}",
-                tags_updater(str_tags, config.input_settings.separated_tags_by)
-                    .join(&format!("{} ", config.input_settings.separated_tags_by))
-            )
-        })
+        .message(&config.create_post_settings.tags_message)
+        .validate_on_key(validators::is_valid_tags(config))
+        .validate(validators::tags_validator(config))
+        .transform(helpers::tags_transform(config))
         .when(helpers::is_new_post(config))
         .build()
 }
@@ -94,31 +64,16 @@ fn post_tags_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_slug_question(config: &'static Config) -> Question {
     Question::input("post_slug")
-        .message(&config.input_settings.slug_message)
-        // Validate when write the slug ( slug will be red if `is_valid_length` return false )
+        .message(&config.create_post_settings.slug_message)
         .validate_on_key(helpers::join_on_key_validator(
-            is_valid_length(
-                config.input_settings.minimum_slug_length,
-                config.input_settings.maximum_slug_length,
-            ),
-            |slug, answers| {
-                file_path_validator(true)(&to_post_path(config, &slug_updater(slug)), answers)
-                    .is_ok()
-            },
+            validators::is_valid_slug_length(config),
+            validators::is_valid_slug_path(config),
         ))
-        // Validate if slug already exists, and slug length
         .validate(helpers::join_str_validators(
-            length_validator(
-                "post description",
-                config.input_settings.minimum_slug_length,
-                config.input_settings.maximum_slug_length,
-            ),
-            |slug, answers: &Answers| {
-                file_path_validator(true)(&to_post_path(config, slug), answers)
-            },
+            validators::slug_lenth(config),
+            validators::slug_path_validator(config),
         ))
         .transform(|slug, _, backend| write!(backend, "{}", slug_updater(slug)))
-        // Run this question when user choice to create a new post
         .when(helpers::is_new_post(config))
         .build()
 }
@@ -128,11 +83,10 @@ fn post_slug_question(config: &'static Config) -> Question {
 #[logfn_inputs(Info)]
 fn post_image_question(config: &'static Config) -> Question {
     Question::input("post_image")
-        .message(&config.input_settings.image_message)
-        .validate_on_key(|str_path, answers| file_path_validator(false)(str_path, answers).is_ok())
-        .validate(file_path_validator(false))
-        .transform(|str_path, _, backend| write!(backend, "{}", full_path(str_path)))
-        // Run this question when user choice to create a new post
+        .message(&config.create_post_settings.image_message)
+        .validate_on_key(validators::is_valid_path(false))
+        .validate(validators::file_path_validator(false))
+        .transform(helpers::full_path_transform())
         .when(helpers::is_new_post(config))
         .build()
 }

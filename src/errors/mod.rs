@@ -34,6 +34,10 @@ pub enum ApcError {
     FileSystem(String),
     #[error("{0}")]
     Requestty(String),
+    #[error("{0}")]
+    PostProperties(String),
+    #[error("{0}")]
+    Other(String),
 }
 
 impl ApcError {

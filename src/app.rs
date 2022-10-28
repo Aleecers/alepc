@@ -17,16 +17,45 @@
 
 use crate::config::Config;
 use crate::errors::{ApcError, ApcResult};
-use crate::utils;
-use crate::utils::questions::create::post_properties;
+use crate::utils::questions::{create::post_properties, modify::modify_post_properties};
 use crate::utils::Post;
+use crate::CONFIG;
 use requestty::{prompt, Answers, Question};
 
 #[derive(Debug)]
-pub enum PostAction {
-    Create,
+pub enum Action {
+    Create(Post),
+    Modify {
+        new_post: Post,
+        new_slug: String,
+        new_image_path: String,
+    },
     Version,
-    _Modify,
+}
+
+impl TryFrom<&Answers> for Action {
+    type Error = ApcError;
+
+    fn try_from(answers: &Answers) -> ApcResult<Action> {
+        let action = answers
+            .get("action")
+            .unwrap()
+            .as_list_item()
+            .unwrap()
+            .text
+            .as_str();
+        let config: &Config = CONFIG.as_ref().unwrap();
+        if action == config.select_action.new_post_choice {
+            // Create action
+            Post::create_action(config, answers)
+        } else if action == config.select_action.update_existing_post {
+            // Modify action
+            Post::modify_action(config, answers)
+        } else {
+            // Version action
+            Ok(Self::Version)
+        }
+    }
 }
 
 const VERSION: &str = "0.1.0";
@@ -45,61 +74,8 @@ fn questions(config: &'static Config) -> Vec<Question> {
         .default(0)
         .build()];
     questions.append(&mut post_properties(config));
+    questions.append(&mut modify_post_properties(config));
     questions
-}
-
-/// Returns post from answers, None if there is no post
-#[logfn(Debug)]
-#[logfn_inputs(Info)]
-pub fn post_from_answers<'a>(
-    apc_config: &'a Config,
-    answers: &'a Answers,
-) -> ApcResult<(Option<Post<'a>>, PostAction)> {
-    // FIXME: Use `match`
-    if answers.get("action").unwrap().as_list_item().unwrap().text
-        == apc_config.select_action.new_post_choice
-    {
-        let slug = answers.get("post_slug").unwrap().as_string().unwrap();
-        Ok((
-            Some(Post::new(
-                apc_config,
-                answers
-                    .get("post_title")
-                    .unwrap()
-                    .as_string()
-                    .unwrap()
-                    .trim(),
-                slug,
-                true,
-                answers
-                    .get("post_description")
-                    .unwrap()
-                    .as_string()
-                    .unwrap()
-                    .trim(),
-                utils::tags_updater(
-                    answers.get("post_tags").unwrap().as_string().unwrap(),
-                    apc_config.input_settings.separated_tags_by,
-                ),
-                utils::copy_image(
-                    apc_config,
-                    slug,
-                    answers.get("post_image").unwrap().as_string().unwrap(),
-                )?,
-            )),
-            PostAction::Create,
-        ))
-    } else if answers.get("action").unwrap().as_list_item().unwrap().text
-        == apc_config.select_action.new_post_choice
-    {
-        unimplemented!("Unimplemented action")
-    } else if answers.get("action").unwrap().as_list_item().unwrap().text
-        == apc_config.select_action.version_choice
-    {
-        Ok((None, PostAction::Version))
-    } else {
-        panic!("Unsupported action")
-    }
 }
 
 #[logfn(Debug)]
@@ -109,16 +85,21 @@ pub fn run(config: &'static Config) -> ApcResult<()> {
         log::error!("{:?}", err);
         ApcError::Requestty(err.to_string())
     })?;
-    let (post, action) = post_from_answers(config, &answers)?;
+    let action = Action::try_from(&answers)?;
+    log::debug!("answers = {answers:?}\naction = {action:?}");
     match action {
-        PostAction::Create => post.unwrap().write_in_file(config)?,
-        PostAction::Version => {
+        Action::Create(post) => post.write_in_file(config)?,
+        Action::Modify {
+            mut new_post,
+            new_slug,
+            new_image_path,
+        } => new_post.modify_post(new_slug, new_image_path)?,
+        Action::Version => {
             println!(
                 "⚙ Version: v{}\n🕸 Repository: {}",
                 VERSION, config.repository_url
             );
         }
-        _ => unimplemented!("Unimplemented Action"),
     }
     Ok(())
 }
