@@ -85,17 +85,17 @@ macro_rules! validate_configuration_slashes {
 #[educe(Default)]
 /// Select action configuration structure
 pub struct SelectAction {
-    #[educe(Default = "What do you want to do ❓")]
     /// The question of select action
+    #[educe(Default = "What do you want to do ❓")]
     pub select_action_message: String,
-    #[educe(Default = "Create a new post ✍")]
     /// Create a new post choice in select
+    #[educe(Default = "Create a new post ✍")]
     pub new_post_choice: String,
-    #[educe(Default = "Update existing post 🖌️")]
     /// Update an existing post choice
+    #[educe(Default = "Update existing post 🖌️")]
     pub update_existing_post: String,
-    #[educe(Default = "Alepc Version ⚙")]
     /// Version choice
+    #[educe(Default = "Alepc Version ⚙")]
     pub version_choice: String,
 }
 
@@ -103,57 +103,57 @@ pub struct SelectAction {
 #[educe(Default)]
 /// Inputs setting structure
 pub struct CreatePostSettings {
-    #[educe(Default = 7)]
     /// Minimum length of post title
+    #[educe(Default = 7)]
     pub minimum_title_length: u8,
-    #[educe(Default = 30)]
     /// Maximum length of post title
+    #[educe(Default = 30)]
     pub maximum_title_length: u8,
-    #[educe(Default = "Title of post 📝")]
     /// Ask for post title message
+    #[educe(Default = "Title of post 📝")]
     pub title_message: String,
 
-    #[educe(Default = 10)]
     /// Minimum length of post description
+    #[educe(Default = 10)]
     pub minimum_description_length: u8,
-    #[educe(Default = 255)]
     /// Maximum length of post description
+    #[educe(Default = 255)]
     pub maximum_description_length: u8,
-    #[educe(Default = "Description of post 📝")]
     /// Ask for post description message
+    #[educe(Default = "Description of post 📝")]
     pub description_message: String,
 
-    #[educe(Default = 1)]
     /// Minimum tags on post
+    #[educe(Default = 1)]
     pub minimum_tags_count: u8,
-    #[educe(Default = 3)]
     /// Maximum tags on post
-    pub maximum_tags_count: u8,
-    #[educe(Default = "Tags of post (separated by comma)")]
-    /// Ask for post tags message
-    pub tags_message: String,
-    #[educe(Default = ',')]
-    /// separated tags by
-    pub separated_tags_by: char,
     #[educe(Default = 3)]
+    pub maximum_tags_count: u8,
+    /// Ask for post tags message
+    #[educe(Default = "Tags of post (separated by comma)")]
+    pub tags_message: String,
+    /// separated tags by
+    #[educe(Default = ',')]
+    pub separated_tags_by: char,
     /// Minimum single tag length
+    #[educe(Default = 3)]
     pub minimum_single_tag_length: u8,
-    #[educe(Default = 8)]
     /// Maximum single tag length
+    #[educe(Default = 8)]
     pub maximum_single_tag_length: u8,
 
-    #[educe(Default = "Slug of post")]
     /// Ask for post slug message
+    #[educe(Default = "Slug of post")]
     pub slug_message: String,
-    #[educe(Default = 5)]
     /// Minimum length of post slug
+    #[educe(Default = 5)]
     pub minimum_slug_length: u8,
-    #[educe(Default = 20)]
     /// Maximum length of post slug
+    #[educe(Default = 20)]
     pub maximum_slug_length: u8,
 
-    #[educe(Default = "Image of post")]
     /// Ask for post image message
+    #[educe(Default = "Image of post")]
     pub image_message: String,
 }
 
@@ -202,26 +202,26 @@ pub struct ModifyPostSettings {
 #[educe(Default)]
 /// Config structure for Alepc
 pub struct Config {
-    #[educe(Default = "../Aleecers.github.io/src/pages/blog/")]
     /// Path of posts
+    #[educe(Default = "../Aleecers.github.io/src/pages/blog/")]
     pub posts_path: String,
-    #[educe(Default = "../Aleecers.github.io/public/images/")]
     /// Path to images directory
+    #[educe(Default = "../Aleecers.github.io/public/images/")]
     pub images_path: String,
-    #[educe(Default = "/blog/")]
     /// Path of blog in the site
+    #[educe(Default = "/blog/")]
     pub blog_site_path: String,
-    #[educe(Default = "/images/")]
     /// Path of images in the site
+    #[educe(Default = "/images/")]
     pub images_site_path: String,
-    #[educe(Default = "../../layouts/blog.astro")]
     /// Layout path of posts ( path start from `posts_path` )
+    #[educe(Default = "../../layouts/blog.astro")]
     pub posts_layout: String,
-    #[educe(Default = "https://github.com/aleecers/alepc")]
     /// Repository url
+    #[educe(Default = "https://github.com/aleecers/alepc")]
     pub repository_url: String,
-    #[educe(Default = "%Y/%m/%d")]
     /// Date format
+    #[educe(Default = "%Y/%m/%d")]
     pub date_format: String,
     /// Select action structure
     pub select_action: SelectAction,
