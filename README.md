@@ -3,7 +3,7 @@
 <div align="center">
 
 # Alepc | Aleecers post cli
-CLI to create post template for [aleecers blog]
+CLI to create/modify post template for [aleecers blog]
 
 <a href="https://www.gnu.org/licenses/">
   <img src="https://img.shields.io/badge/license-GPLv3-orange.svg" alt="License">
@@ -34,6 +34,14 @@ CLI to create post template for [aleecers blog]
 - Configuration file ( [RON] )
 - Save configuration file in config system directory [`#6`], [`#2`], [`#9`]
 - The ability to show the [logs](#Logging) [`#5`], [`#11`]
+- Modify [`#24`]
+  - Title
+  - Description
+  - Slug (Will rename the post file, images folder, link, header. in one click 🦀)
+  - Post header (Just enter the new image and will copy it to images directory and rename it 💪)
+  - Last modified date (in one click)
+  - Draft status (in one click)
+
 
 ## Installation
 ### Assets
@@ -60,9 +68,13 @@ To show logs run Alepc with [`RUST_LOG`] environment variable with [`trace`] val
 
 ## Images
 
-| Home                                      | Create                                     |
+| Home                                      | Creation                                     |
 |-------------------------------------------|--------------------------------------------|
-| ![home-screen](https://i.suar.me/05Xmr/l) | ![create-image](https://i.suar.me/G5KA9/s) |
+| ![home-screen](https://i.suar.me/05Xmr/l) | ![creation-image](https://i.suar.me/G5KA9/s) |
+
+| Modification                              |Modify all                                     |
+|-------------------------------------------|--------------------------------------------|
+| ![modification-screen](https://i.suar.me/XovgB/l)| ![creation-image](https://i.suar.me/55P52/l) |
 
 
 ## License
@@ -80,3 +92,4 @@ GNU General Public License version 3 of the license for more see <https://www.gn
 [`#9`]: https://github.com/Aleecers/alepc/pull/9
 [`#5`]: https://github.com/Aleecers/alepc/issues/5
 [`#11`]: https://github.com/Aleecers/alepc/pull/11
+[`#24`]: https://github.com/Aleecers/alepc/pull/24
