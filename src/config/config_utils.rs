@@ -83,6 +83,7 @@ macro_rules! validate_configuration_slashes {
 
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
+#[serde(default)]
 /// Select action configuration structure
 pub struct SelectAction {
     /// The question of select action
@@ -101,6 +102,7 @@ pub struct SelectAction {
 
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
+#[serde(default)]
 /// Inputs setting structure
 pub struct CreatePostSettings {
     /// Minimum length of post title
@@ -159,6 +161,7 @@ pub struct CreatePostSettings {
 
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
+#[serde(default)]
 pub struct ModifyPostSettings {
     /// The question of post name
     #[educe(Default = "What's the post you want to modify it (Write the slug)")]
@@ -200,6 +203,7 @@ pub struct ModifyPostSettings {
 
 #[derive(Deserialize, Serialize, Debug, Educe)]
 #[educe(Default)]
+#[serde(default)]
 /// Config structure for Alepc
 pub struct Config {
     /// Path of posts
