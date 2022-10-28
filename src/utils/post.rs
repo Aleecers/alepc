@@ -200,7 +200,7 @@ impl Post {
             get_modifing_post(config, answers).expect("The action should be `Modify` action");
         let status = ModifyStatus::from(answers);
         let mut post = Post::from_file(config, &old_path)?;
-        let new_props = Props::try_from(answers)?;
+        let new_props = Props::modified_from_answers(answers)?;
 
         if post.slug != new_props.slug {
             // Check if the new slug is already existing or not
