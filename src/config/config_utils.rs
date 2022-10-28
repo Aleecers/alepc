@@ -17,8 +17,7 @@
 
 use crate::errors::{ApcError, ApcResult};
 use directories::ProjectDirs;
-use ron::ser as ron_ser;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::fs;
 use std::path::Path;
 
@@ -81,7 +80,7 @@ macro_rules! validate_configuration_slashes {
     };
 }
 
-#[derive(Deserialize, Serialize, Debug, Educe)]
+#[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
 /// Select action configuration structure
@@ -100,7 +99,7 @@ pub struct SelectAction {
     pub version_choice: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Educe)]
+#[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
 /// Inputs setting structure
@@ -159,7 +158,7 @@ pub struct CreatePostSettings {
     pub image_message: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Educe)]
+#[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
 pub struct ModifyPostSettings {
@@ -201,7 +200,7 @@ pub struct ModifyPostSettings {
     pub keep_old_value_message: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Educe)]
+#[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
 /// Config structure for Alepc
@@ -256,55 +255,28 @@ impl Config {
         validate_configuration_slashes!(&self.images_site_path, images_site_path, config_issue);
         Ok(self)
     }
-    /// Write configuration in `config_path`
-    #[logfn(Debug)]
-    #[logfn_inputs(Info)]
-    pub fn write(self, config_path: &Path) -> ApcResult<Self> {
-        let parent = config_path.parent();
-        if matches!(parent, Some(parent) if !parent.exists()) {
-            log::debug!("Create config parent: {:?}", parent);
-            fs::create_dir_all(parent.unwrap()).map_err(|err| {
-                log::error!("{:?}", err);
-                ApcError::FileSystem(err.to_string())
-            })?
-        }
-        fs::write(
-            config_path,
-            ron_ser::to_string_pretty(&self, ron_ser::PrettyConfig::default()).map_err(|err| {
-                ApcError::ParseRon {
-                    code: err.code,
-                    position: err.position,
-                }
-            })?,
-        )
-        .map_err(|err| {
-            log::error!("{:?}", err);
-            ApcError::FileSystem(err.to_string())
-        })?;
-        Ok(self)
-    }
 }
 
 /// Return config
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
-pub fn config() -> ApcResult<ApcResult<Config>> {
+pub fn config() -> ApcResult<Config> {
     let config_path = ProjectDirs::from("", ORGANIZATION, APP_NAME)
-        .map(|path| path.config_dir().join("config.ron"));
-    if let Some(config_path) = config_path {
-        if config_path.exists() {
-            match fs::read_to_string(config_path) {
-                Ok(str_ron) => Ok(ron::from_str(&str_ron).map_err(|err| ApcError::ParseRon {
-                    code: err.code,
-                    position: err.position,
-                })),
-                Err(err) => Err(ApcError::FileSystem(err.to_string())),
-            }
-        } else {
-            Ok(Config::default().write(&config_path))
+        .map(|path| path.config_dir().join("config.ron"))
+        .ok_or_else(|| ApcError::FileSystem("Can't get config path".to_string()))?;
+
+    if config_path.exists() {
+        match fs::read_to_string(config_path) {
+            Ok(str_ron) => ron::from_str(&str_ron).map_err(|err| ApcError::ParseRon {
+                code: err.code,
+                position: err.position,
+            }),
+            Err(err) => Err(ApcError::FileSystem(err.to_string())),
         }
     } else {
-        Ok(Ok(Config::default()))
+        fs::write(config_path, "(\n    \n)")
+            .map_err(|err| ApcError::FileSystem(err.to_string()))?;
+        Ok(Config::default())
     }
 }
 
@@ -312,5 +284,5 @@ pub fn config() -> ApcResult<ApcResult<Config>> {
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
 pub fn get_config() -> ApcResult<Config> {
-    config()??.configuration()
+    config()?.configuration()
 }
