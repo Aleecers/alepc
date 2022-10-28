@@ -66,6 +66,10 @@ after the build you can find binary file in `./target/release/alepc`
 ## Logging
 To show logs run Alepc with [`RUST_LOG`] environment variable with [`trace`] value
 
+## Configuration
+Alepc will create empty configuration file in config system directory, to know where its see [`#2`].
+You can change the configuration file to your needs.
+
 ## Images
 
 | Home                                      | Creation                                     |
