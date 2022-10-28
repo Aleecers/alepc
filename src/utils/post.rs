@@ -28,7 +28,7 @@ use std::path::{Path, PathBuf};
 
 use super::helpers::get_modifing_post;
 use super::properties::{ExtractProp, ModifyStatus, Props};
-use super::{copy_post_header, full_path, parse_bool};
+use super::{copy_post_header, full_path, parse_bool, replace_tilde_with_home_dir};
 
 #[derive(Debug, Clone, Copy)]
 pub enum PostProperties {
@@ -109,7 +109,7 @@ impl PostProperties {
                     )
                     .unwrap_or(image)
                 } else {
-                    full_path(&image)
+                    full_path(&replace_tilde_with_home_dir(&image))
                 }
             }),
             Self::Tags => answers.extract_prop("new_post_tags").map(|tags| {

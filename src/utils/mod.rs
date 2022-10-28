@@ -76,11 +76,33 @@ pub fn parse_str_date(date: &str, date_format: &str) -> ApcResult<DateTime<Local
         })
 }
 
+/// Try to replace `~` with home dircetory
+/// If `~` is not present, return the same string
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+#[allow(clippy::manual_strip)]
+fn replace_tilde_with_home_dir(path: &str) -> String {
+    if path.starts_with('~') {
+        format!(
+            "{}{}",
+            directories::UserDirs::new()
+                .expect("Failed to get home directory")
+                .home_dir()
+                .to_str()
+                .unwrap_or(path)
+                .to_owned(),
+            &path[1..]
+        )
+    } else {
+        path.to_owned()
+    }
+}
+
 /// Move new post headeer to images directory, return new post headeer image path
 #[logfn_inputs(Info)]
 #[logfn(Debug)]
 pub fn copy_post_header(config: &Config, slug: &str, new_post_header: &str) -> ApcResult<String> {
-    let full_new_header_path = full_path(new_post_header);
+    let full_new_header_path = full_path(&replace_tilde_with_home_dir(new_post_header));
     let extension = Path::new(&full_new_header_path)
         .extension()
         .map(|os_str| os_str.to_str().unwrap_or("png"))
