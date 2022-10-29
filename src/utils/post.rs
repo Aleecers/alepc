@@ -397,10 +397,37 @@ impl Post {
             .with_extension("md")
     }
 
+    /// Return the post content from file
+    /// ## Notes:
+    /// - If the content is empty, will return empty string.
+    /// - If the content is not empty, will return the content without the properties.
+    ///
+    /// ## Errors:
+    /// - If cannot read the file.
+    #[logfn(Debug)]
+    #[logfn_inputs(Info)]
+    pub fn content(&self) -> ApcResult<String> {
+        let config = CONFIG.as_ref().unwrap();
+        let content = fs::read_to_string(self.path(config))
+            .map_err(|err| ApcError::FileSystem(err.to_string()))?;
+
+        Ok(content[self.full_properties(config).len()..]
+            .trim()
+            .to_string())
+    }
+
     /// Write the post properties in file
     #[logfn(Debug)]
     pub fn write_in_file(&self, config: &'static Config) -> ApcResult<()> {
-        fs::write(self.path(config), self.full_properties(config)).map_err(|err| {
+        fs::write(
+            self.path(config),
+            format!(
+                "{}\n{}",
+                self.full_properties(config),
+                self.content()?.trim()
+            ),
+        )
+        .map_err(|err| {
             log::error!("{:?}", err);
             ApcError::FileSystem(err.to_string())
         })?;
