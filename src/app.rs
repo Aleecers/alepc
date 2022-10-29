@@ -1,4 +1,4 @@
-// Simple CLI to create aleecers post template
+// Simple CLI to create/modify aleecers post template
 //     Copyright (C) 2020-2022  TheAwiteb
 //     https://github.com/aleecers/Alepc
 //
