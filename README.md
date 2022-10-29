@@ -69,6 +69,103 @@ To show logs run Alepc with [`RUST_LOG`] environment variable with [`trace`] val
 ## Configuration
 Alepc will create empty configuration file in config system directory, to know where its see [`#2`].
 You can change the configuration file to your needs.
+Below is the table of configuration you can used in configuration file, the examples is whoe you can use it in configuration file.
+
+### Global configuration
+| Key | Type | Description | Default |
+| --- | --- | --- | --- |
+|`posts_path`| String | Path of posts |`../Aleecers.github.io/src/pages/blog/`|
+|`images_path`| String | Path to images directory |`../Aleecers.github.io/public/images/`|
+|`blog_site_path`| String | Path of blog in the site |`/blog/`|
+|`images_site_path`| String | Path of images in the site |`/images/`|
+|`posts_layout`| String | Layout path of posts ( path start from `posts_path` ) |`../../layouts/blog.astro`|
+|`repository_url`| String | Repository url |`https://github.com/aleecers/alepc`|
+|`date_format`| String | Date format |`%Y/%m/%d`|
+
+#### Example
+```ron
+(
+    posts_path: "../Aleecers.github.io/src/pages/blog/",
+    images_path: "../Aleecers.github.io/public/images/",
+    blog_site_path: "/blog/",
+)
+```
+
+### `select_action` configuration
+| Key | Type | Description | Default |
+| --- | --- | --- | --- |
+|`select_action_message`| String | The question of select action |`What do you want to do ❓`|
+|`new_post_choice`| String | Create a new post choice in select |`Create a new post ✍`|
+|`update_existing_post`| String | Update an existing post choice |`Update existing post 🖌️`|
+|`version_choice`| String | Version choice |`Alepc Version ⚙`|
+
+#### Example
+```ron
+(
+  select_action: (
+      select_action_message: "What do you want to do ❓",
+      new_post_choice: "Create a new post ✍",
+  )
+)
+```
+
+### `create_post_settings` configuration
+| Key | Type | Description | Default |
+| --- | --- | --- | --- |
+|`minimum_title_length`| Integer | Minimum length of post title|`7`|
+|`maximum_title_length`| Integer | Maximum length of post title|`30`|
+|`title_message`| String | Ask for post title message |`Title of post 📝`|
+|`minimum_description_length`| Integer | Minimum length of post description|`10`|
+|`maximum_description_length`| Integer | Maximum length of post description|`255`|
+|`description_message`| String | Ask for post description message |`Description of post 📝`|
+|`minimum_tags_count`| Integer | Minimum tags on post|`1`|
+|`maximum_tags_count`| Integer | Maximum tags on post|`3`|
+|`tags_message`| String | Ask for post tags message |`Tags of post (separated by comma)`|
+|`separated_tags_by`| Char | separated tags by | `,` |
+|`minimum_single_tag_length`| Integer | Minimum single tag length|`3`|
+|`maximum_single_tag_length`| Integer | Maximum single tag length|`8`|
+|`slug_message`| String | Ask for post slug message |`Slug of post`|
+|`minimum_slug_length`| Integer | Minimum length of post slug|`5`|
+|`maximum_slug_length`| Integer | Maximum length of post slug|`20`|
+|`image_message`| String | Ask for post image message |`Image of post`|
+
+#### Example
+```ron
+(
+  create_post_settings: (
+      minimum_title_length: 7,
+      maximum_title_length: 30,
+      title_message: "Title of post 📝",
+  )
+)
+```
+
+### `modify_post_settings` configuration
+| Key | Type | Description | Default |
+| --- | --- | --- | --- |
+|`post_name_question`| String | The question of post name |`What's the post you want to modify it (Write the slug)`|
+|`choice_action`| String | Choice modify action |`What do you want to update?`|
+|`update_the_date_question`| String | Update date question |`Update modified date`|
+|`update_draft_status_question`| String | Update draft status question ( Will add the currently status in the end) |`Update draft status`|
+|`show_all_question`| String | Show all fields to update it question |`Show all`|
+|`new_post_slug`| String | New post slug question (Wheen show_all) |`New post slug`|
+|`new_post_title`| String | New post title question (Wheen show_all) |`New post title`|
+|`new_post_descrioption`| String | New post descripation question (Wheen show_all) |`New post description`|
+|`new_post_image`| String | New post image question (Wheen show_all) |`New post image`|
+|`new_post_tags`| String | New post tags question (Wheen show_all) |`New post tags`|
+|`new_post_draft`| String | New post draft status question (Wheen show_all) |`Do you want to change draft status?`|
+|`keep_old_value_message`| String | Message to keep old value |`Press enter to keep it 🤏`|
+
+#### Example
+```ron
+(
+  modify_post_settings: (
+      post_name_question: "What's the post you want to modify it (Write the slug)",
+      choice_action: "What do you want to update?",
+      update_the_date_question: "Update modified date",
+  )
+)
+```
 
 ## Images
 
