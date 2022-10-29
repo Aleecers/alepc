@@ -27,7 +27,7 @@ pub use post::*;
 use crate::config::Config;
 use crate::errors::{ApcError, ApcResult};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Update the slug to correct one
 pub fn slug_updater(slug: &str) -> String {
@@ -108,12 +108,15 @@ pub fn copy_post_header(config: &Config, slug: &str, new_post_header: &str) -> A
         .map(|os_str| os_str.to_str().unwrap_or("png"))
         .unwrap_or("png");
     let slug = slug_updater(slug);
+    let slug_dir = PathBuf::from(format!("{}{slug}/", config.images_path));
     let filename = format!("{slug}-header.{extension}");
     let to_path = format!("{}{slug}/{filename}", config.images_path,);
-    fs::create_dir(format!("{}{slug}/", config.images_path)).map_err(|err| {
-        log::error!("{:?}", err);
-        ApcError::FileSystem(err.to_string())
-    })?;
+    if !slug_dir.exists() {
+        fs::create_dir(slug_dir).map_err(|err| {
+            log::error!("{:?}", err);
+            ApcError::FileSystem(err.to_string())
+        })?;
+    }
     fs::copy(full_new_header_path, &to_path).map_err(|err| {
         log::error!("{:?}", err);
         ApcError::FileSystem(err.to_string())
