@@ -22,6 +22,9 @@ use crate::utils::Post;
 use crate::CONFIG;
 use requestty::{prompt, Answers, Question};
 
+// Version of the app, will removed in 0.3.0
+const VERSION: &str = "0.1.0";
+
 #[derive(Debug)]
 pub enum Action {
     Create(Post),
@@ -57,8 +60,6 @@ impl TryFrom<&Answers> for Action {
         }
     }
 }
-
-const VERSION: &str = "0.1.0";
 
 /// Return the questions
 #[logfn(Debug)]

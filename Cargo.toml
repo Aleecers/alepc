@@ -1,6 +1,6 @@
 [package]
 name = "alepc"
-version = "0.1.0" # Don't forget to update the version in `./src/app.rs`
+version = "0.2.0" # Don't forget to update the version in `./src/app.rs`
 edition = "2021"
 rust-version = "1.62"
 license = "GPL-3.0-only"
