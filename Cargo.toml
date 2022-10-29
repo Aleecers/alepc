@@ -21,7 +21,7 @@ log = "= 0.4.17"
 log-derive = "= 0.4.1"
 pretty_env_logger = "= 0.4.0"
 regex = "1.6.0"
-requestty = { git = "https://github.com/Lutetium-Vanadium/requestty.git", rev = "550ee1d" }
+requestty = "0.5.0"
 ron = "= 0.7.1"
 serde = { version = "= 1.0.140", features = ["derive"] }
 strum = { version = "= 0.24.1", features = ["derive"] }
