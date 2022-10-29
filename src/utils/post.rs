@@ -204,14 +204,14 @@ impl Post {
 
         if post.slug != new_props.slug {
             // Check if the new slug is already existing or not
-            if fs::read_dir(&config.images_path)
-                .map_err(|err| ApcError::FileSystem(format!("'{}' {}", config.images_path, err)))?
+            if fs::read_dir(&config.posts_path)
+                .map_err(|err| ApcError::FileSystem(format!("'{}' {}", config.posts_path, err)))?
                 .collect::<Result<Vec<fs::DirEntry>, std::io::Error>>()
                 .map_err(|err| {
-                    ApcError::FileSystem(format!("File in `{}`: {}", config.images_path, err))
+                    ApcError::FileSystem(format!("File in `{}`: {}", config.posts_path, err))
                 })?
                 .iter()
-                .all(|entry| entry.file_name() == OsString::from(&new_props.slug))
+                .all(|entry| entry.file_name() == OsString::from(format!("{}.md", new_props.slug)))
             {
                 return Err(ApcError::PostProperties(
                     "The new slug is already existing".to_owned(),
@@ -416,6 +416,11 @@ impl Post {
         let old_slug = self.slug.clone();
         self.update_slug(config, &new_slug)?;
         self.update_images(config, &old_slug)?;
+        if new_image != self.image_path {
+            fs::remove_file(&self.image_path)
+                .map_err(|err| ApcError::FileSystem(format!("`{}` {}", self.image_path, err)))?;
+            self.image_path = copy_post_header(config, &self.slug, &new_image)?;
+        }
         self.write_in_file(config)?;
         Ok(())
     }
