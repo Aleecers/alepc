@@ -1,0 +1,17 @@
+name: Move issues/prs to released
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  move_card:
+    if: ${{ ( github.event.pull_request.merged == true ) && ( github.event.pull_request.head.ref == 'dev' ) && ( github.event.pull_request.base.ref == 'master' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move dev cards to released
+        uses: actions/checkout@v2
+      - run: sudo apt-get install -y jq
+      - run: bash ./.github/moved_to_released.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}

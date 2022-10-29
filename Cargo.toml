@@ -1,20 +1,27 @@
 [package]
 name = "alepc"
-version = "0.1.0" # Don't forget to update the version in `./src/app.rs`
+version = "0.2.0" # Don't forget to update the version in `./src/app.rs`
 edition = "2021"
 rust-version = "1.62"
 license = "GPL-3.0-only"
 authors = ["Awiteb <https://github.com/TheAwiteb>"]
 readme = "README.md"
-description = "Simple CLI to create aleecers post template 🦀"
+description = "Simple CLI to create/modify aleecers post template 🦀"
 repository = "https://github.com/aleecers/Alepc"
 keywords = ["helper", "CLI"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-chrono = "= 0.4.19"
+chrono = "= 0.4.22"
 colored = "= 2.0.0"
-requestty = "= 0.4.1"
+directories = "= 4.0.1"
+educe = { version = "0.4.19", features = ["Default"] }
+lazy_static = "= 1.4.0"
+log = "= 0.4.17"
+log-derive = "= 0.4.1"
+pretty_env_logger = "= 0.4.0"
+regex = "1.6.0"
+requestty = { git = "https://github.com/Lutetium-Vanadium/requestty.git", rev = "550ee1d" }
 ron = "= 0.7.1"
 serde = { version = "= 1.0.140", features = ["derive"] }
 strum = { version = "= 0.24.1", features = ["derive"] }

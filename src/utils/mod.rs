@@ -1,4 +1,4 @@
-// Simple CLI to create aleecers post template
+// Simple CLI to create/modify aleecers post template
 //     Copyright (C) 2020-2022  TheAwiteb
 //     https://github.com/aleecers/Alepc
 //
@@ -15,24 +15,23 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-mod creator;
+pub mod helpers;
+mod post;
+pub mod properties;
 pub mod questions;
 pub mod validators;
 
-pub use creator::*;
-use std::ffi::OsStr;
+use chrono::{DateTime, Local, NaiveDate};
+pub use post::*;
 
 use crate::config::Config;
 use crate::errors::{ApcError, ApcResult};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Update the slug to correct one
 pub fn slug_updater(slug: &str) -> String {
-    slug.trim()
-        .to_ascii_lowercase()
-        .replace(' ', "-")
-        .replace('_', "-")
+    slug.trim().to_ascii_lowercase().replace([' ', '_'], "-")
 }
 
 /// Update the string tags to correct one
@@ -46,6 +45,8 @@ pub fn tags_updater(str_tags: &str, separated_by: char) -> Vec<String> {
 
 /// Return full path of existing one
 /// Panic if path is not existing
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
 pub fn full_path(str_path: &str) -> String {
     fs::canonicalize(str_path)
         .unwrap()
@@ -56,22 +57,111 @@ pub fn full_path(str_path: &str) -> String {
 
 /// Convert a slug to markdown path
 pub fn to_post_path(config: &Config, slug: &str) -> String {
-    format!("{}/{}.md", config.posts_path, slug_updater(slug))
+    format!("{}{}.md", config.posts_path, slug_updater(slug))
 }
 
-/// Move image to images directory, return image name
-pub fn copy_image(config: &Config, slug: &str, image_path: &str) -> ApcResult<String> {
-    let full_image_path = full_path(image_path);
-    let extension = Path::new(&full_image_path)
+/// Parse a str date
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+pub fn parse_str_date(date: &str, date_format: &str) -> ApcResult<DateTime<Local>> {
+    NaiveDate::parse_from_str(date, date_format)
+        .map_err(|err| ApcError::PostProperties(err.to_string()))?
+        .and_hms(0, 0, 0)
+        .and_local_timezone(Local)
+        .single()
+        .ok_or_else(|| {
+            ApcError::PostProperties(format!(
+                "Cannot parse `{date}` date with this `{date_format}` format"
+            ))
+        })
+}
+
+/// Try to replace `~` with home dircetory
+/// If `~` is not present, return the same string
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+#[allow(clippy::manual_strip)]
+fn replace_tilde_with_home_dir(path: &str) -> String {
+    if path.starts_with('~') {
+        format!(
+            "{}{}",
+            directories::UserDirs::new()
+                .expect("Failed to get home directory")
+                .home_dir()
+                .to_str()
+                .unwrap_or(path)
+                .to_owned(),
+            &path[1..]
+        )
+    } else {
+        path.to_owned()
+    }
+}
+
+/// Move new post headeer to images directory, return new post headeer image path
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+pub fn copy_post_header(config: &Config, slug: &str, new_post_header: &str) -> ApcResult<String> {
+    let full_new_header_path = full_path(&replace_tilde_with_home_dir(new_post_header));
+    let extension = Path::new(&full_new_header_path)
         .extension()
-        .unwrap_or_else(|| OsStr::new("png"))
-        .to_str()
+        .map(|os_str| os_str.to_str().unwrap_or("png"))
         .unwrap_or("png");
     let slug = slug_updater(slug);
+    let slug_dir = PathBuf::from(format!("{}{slug}/", config.images_path));
     let filename = format!("{slug}-header.{extension}");
     let to_path = format!("{}{slug}/{filename}", config.images_path,);
-    fs::create_dir(format!("{}{slug}/", config.images_path))
-        .map_err(|err| ApcError::FileSystem(err.to_string()))?;
-    fs::copy(full_image_path, to_path).map_err(|err| ApcError::FileSystem(err.to_string()))?;
-    Ok(filename)
+    if !slug_dir.exists() {
+        fs::create_dir(slug_dir).map_err(|err| {
+            log::error!("{:?}", err);
+            ApcError::FileSystem(err.to_string())
+        })?;
+    }
+    fs::copy(full_new_header_path, &to_path).map_err(|err| {
+        log::error!("{:?}", err);
+        ApcError::FileSystem(err.to_string())
+    })?;
+    Ok(to_path)
+}
+
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+pub fn parse_string(str_string: &str) -> ApcResult<String> {
+    let str_string = str_string.trim();
+    if str_string.starts_with('"') && str_string.ends_with('"') {
+        Ok(str_string.trim_matches('"').chars().collect())
+    } else {
+        Err(ApcError::PostProperties(format!(
+            "`{str_string:?}` invalid string propertie, should start and end with '\"'"
+        )))
+    }
+}
+
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+pub fn parse_str_vec(str_vec: &str) -> ApcResult<Vec<String>> {
+    let str_vec = str_vec.trim();
+    if str_vec.starts_with('[') && str_vec.ends_with(']') {
+        str_vec
+            .trim_matches(|c| "[]".contains(c))
+            .split(',')
+            .map(parse_string)
+            .collect()
+    } else {
+        Err(ApcError::PostProperties(format!(
+            "`{str_vec:?}` invalid list propertie, should start and end with '\"'"
+        )))
+    }
+}
+
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+pub fn parse_bool(str_bool: &str) -> ApcResult<bool> {
+    match str_bool {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        _ => Err(ApcError::PostProperties(format!(
+            "`{str_bool}` invalid boolean"
+        ))),
+    }
 }

@@ -15,30 +15,5 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#[macro_use]
-extern crate educe;
-#[macro_use]
-extern crate log_derive;
-extern crate lazy_static;
-extern crate pretty_env_logger;
-
-mod app;
-mod config;
-mod errors;
-mod utils;
-
-use errors::{ApcError, Statuses};
-use lazy_static::lazy_static;
-use std::env::var;
-
-lazy_static! {
-    static ref CONFIG: Result<config::Config, ApcError> = config::get_config();
-}
-
-fn main() -> Statuses<ApcError> {
-    var("RUST_LOG").is_ok().then(pretty_env_logger::init);
-    match CONFIG.as_ref() {
-        Ok(alepc_config) => app::run(alepc_config).into(),
-        Err(err) => Statuses::Failure(err.clone()),
-    }
-}
+pub mod create;
+pub mod modify;
