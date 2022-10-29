@@ -83,6 +83,7 @@ Below is the table of configuration you can used in configuration file, the exam
 |`date_format`| String | Date format |`%Y/%m/%d`|
 
 #### Example
+> Note: The first parentheses belong to the file itself, if you want to use the above configuration in a file that already has configurations added, delete the first parentheses
 ```ron
 (
     posts_path: "../Aleecers.github.io/src/pages/blog/",
@@ -100,6 +101,7 @@ Below is the table of configuration you can used in configuration file, the exam
 |`version_choice`| String | Version choice |`Alepc Version ⚙`|
 
 #### Example
+> Note: The first parentheses belong to the file itself, if you want to use the above configuration in a file that already has configurations added, delete the first parentheses
 ```ron
 (
   select_action: (
@@ -130,6 +132,7 @@ Below is the table of configuration you can used in configuration file, the exam
 |`image_message`| String | Ask for post image message |`Image of post`|
 
 #### Example
+> Note: The first parentheses belong to the file itself, if you want to use the above configuration in a file that already has configurations added, delete the first parentheses
 ```ron
 (
   create_post_settings: (
@@ -157,6 +160,7 @@ Below is the table of configuration you can used in configuration file, the exam
 |`keep_old_value_message`| String | Message to keep old value |`Press enter to keep it 🤏`|
 
 #### Example
+> Note: The first parentheses belong to the file itself, if you want to use the above configuration in a file that already has configurations added, delete the first parentheses
 ```ron
 (
   modify_post_settings: (
