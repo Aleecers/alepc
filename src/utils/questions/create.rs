@@ -87,6 +87,7 @@ fn post_image_question(config: &'static Config) -> Question {
         .validate_on_key(validators::is_valid_path(false))
         .validate(validators::file_path_validator(false))
         .transform(helpers::full_path_transform())
+        .auto_complete(helpers::autocomplete_files(None, None, false))
         .when(helpers::is_new_post(config))
         .build()
 }

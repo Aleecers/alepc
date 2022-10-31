@@ -29,6 +29,11 @@ fn ask_for_post(config: &'static Config) -> Question {
         .validate_on_key(validators::is_exsiting_post_slug(config))
         .validate(validators::validate_post_path_by_slug(config))
         .transform(|slug, _, backend| write!(backend, "{}", to_post_path(config, slug)))
+        .auto_complete(helpers::autocomplete_files(
+            Some(&config.posts_path),
+            Some(".md"),
+            true,
+        ))
         .when(helpers::is_modify_post(config))
         .build()
 }
@@ -128,6 +133,7 @@ fn new_image(config: &'static Config) -> Question {
             helpers::default_value_transform(config, PostProperties::Image),
             helpers::full_path_transform(),
         ))
+        .auto_complete(helpers::autocomplete_files(None, None, false))
         .when(helpers::is_show_all_action(config))
         .build()
 }
