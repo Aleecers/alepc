@@ -26,7 +26,7 @@ ron = "= 0.7.1"
 rust_search = "= 0.1.4"
 serde = { version = "= 1.0.140", features = ["derive"] }
 strum = { version = "= 0.24.1", features = ["derive"] }
-thiserror = "= 1.0.31"
+thiserror = "= 1.0.37"
 url = { version = "= 2.2.2", features = ["serde"] }
 
 [profile.release]
