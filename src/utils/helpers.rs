@@ -15,8 +15,11 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::config::Config;
-use requestty::{prompt::Backend, Answers};
+use std::path::Path;
+
+use crate::{config::Config, utils::home_dir};
+use requestty::{prompt::Backend, question::Completions, Answers};
+use rust_search::Search;
 
 use super::{full_path, replace_tilde_with_home_dir, to_post_path, PostProperties};
 
@@ -26,6 +29,49 @@ pub fn is_new_post(config: &'static Config) -> impl Fn(&Answers) -> bool {
     move |answers| {
         answers.get("action").unwrap().as_list_item().unwrap().text
             == config.select_action.new_post_choice
+    }
+}
+
+/// Autocomplete for files
+/// ### Arguments
+/// * `dir` - Directory to search for files
+/// * `ext` - File extension to search for'
+/// * `file_name` - Return file name instead of full path
+#[logfn_inputs(Info)]
+pub fn autocomplete_files<'a>(
+    dir: Option<&'a str>,
+    ext: Option<&'a str>,
+    file_name: bool,
+) -> impl FnMut(String, &Answers) -> Completions<String> + 'a {
+    move |prefix, _| {
+        let prefix = replace_tilde_with_home_dir(&prefix);
+        // Workaround file extension bug, see <https://github.com/ParthJadhav/rust_search/issues/4>
+        let extension = format!(r".*\{}", ext.unwrap_or(".*"));
+        let search = Search::new(
+            dir.unwrap_or(&home_dir()),
+            Some(&prefix),
+            Some(&extension),
+            None,
+        );
+        let mut files: Vec<String> = vec![prefix];
+
+        if file_name {
+            files.extend(search.map(|path| {
+                let mut path = Path::new(&path)
+                    .file_name()
+                    .expect("Failed to get file name")
+                    .to_str()
+                    .expect("Failed to convert file name to str");
+                // Remove file extension
+                if let Some(ext) = ext {
+                    path = path.trim_end_matches(ext);
+                }
+                path.to_owned()
+            }));
+        } else {
+            files.extend(search);
+        }
+        Completions::from(files)
     }
 }
 
