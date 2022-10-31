@@ -80,10 +80,10 @@ macro_rules! validate_configuration_slashes {
     };
 }
 
+/// Select action configuration structure
 #[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
-/// Select action configuration structure
 pub struct SelectAction {
     /// The question of select action
     #[educe(Default = "What do you want to do ❓")]
@@ -99,10 +99,10 @@ pub struct SelectAction {
     pub version_choice: String,
 }
 
+/// Inputs setting structure
 #[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
-/// Inputs setting structure
 pub struct CreatePostSettings {
     /// Minimum length of post title
     #[educe(Default = 7)]
@@ -200,10 +200,10 @@ pub struct ModifyPostSettings {
     pub keep_old_value_message: String,
 }
 
+/// Config structure for Alepc
 #[derive(Deserialize, Debug, Educe)]
 #[educe(Default)]
 #[serde(default)]
-/// Config structure for Alepc
 pub struct Config {
     /// Path of posts
     #[educe(Default = "../Aleecers.github.io/src/pages/blog/")]
