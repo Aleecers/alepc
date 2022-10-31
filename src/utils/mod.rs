@@ -76,6 +76,19 @@ pub fn parse_str_date(date: &str, date_format: &str) -> ApcResult<DateTime<Local
         })
 }
 
+/// Return the home directory
+/// Panic if home directory is not found
+#[logfn_inputs(Info)]
+#[logfn(Debug)]
+pub fn home_dir() -> String {
+    directories::UserDirs::new()
+        .expect("Failed to get home directory")
+        .home_dir()
+        .to_str()
+        .expect("Failed to get home directory")
+        .to_owned()
+}
+
 /// Try to replace `~` with home dircetory
 /// If `~` is not present, return the same string
 #[logfn_inputs(Info)]
@@ -83,16 +96,7 @@ pub fn parse_str_date(date: &str, date_format: &str) -> ApcResult<DateTime<Local
 #[allow(clippy::manual_strip)]
 fn replace_tilde_with_home_dir(path: &str) -> String {
     if path.starts_with('~') {
-        format!(
-            "{}{}",
-            directories::UserDirs::new()
-                .expect("Failed to get home directory")
-                .home_dir()
-                .to_str()
-                .unwrap_or(path)
-                .to_owned(),
-            &path[1..]
-        )
+        format!("{}{}", home_dir(), &path[1..])
     } else {
         path.to_owned()
     }
