@@ -15,15 +15,12 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::config::Config;
+use crate::config::{Config, APP_NAME};
 use crate::errors::{ApcError, ApcResult};
 use crate::utils::questions::{create::post_properties, modify::modify_post_properties};
 use crate::utils::Post;
 use crate::CONFIG;
 use requestty::{prompt, Answers, Question};
-
-// Version of the app, will removed in 0.3.0
-const VERSION: &str = "0.1.0";
 
 #[derive(Debug)]
 pub enum Action {
@@ -61,6 +58,14 @@ impl TryFrom<&Answers> for Action {
     }
 }
 
+/// Return the app version with this format: `APP_NAME {version} ({commit} {date}) <{repo}>`
+fn version(repo: &str) -> String {
+    let version = &env!("VERGEN_GIT_SEMVER");
+    let commit = env!("VERGEN_GIT_SHA_SHORT");
+    let date = env!("VERGEN_GIT_COMMIT_DATE");
+    format!("{APP_NAME} {version} ({commit} {date}) <{repo}>")
+}
+
 /// Return the questions
 #[logfn(Debug)]
 #[logfn_inputs(Info)]
@@ -96,10 +101,7 @@ pub fn run(config: &'static Config) -> ApcResult<()> {
             new_image_path,
         } => new_post.modify_post(new_slug, new_image_path)?,
         Action::Version => {
-            println!(
-                "⚙ Version: v{}\n🕸 Repository: {}",
-                VERSION, config.repository_url
-            );
+            println!("{}", version(&config.repository_url));
         }
     }
     Ok(())

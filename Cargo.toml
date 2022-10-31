@@ -1,6 +1,6 @@
 [package]
 name = "alepc"
-version = "0.2.0" # Don't forget to update the version in `./src/app.rs`
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.62"
 license = "GPL-3.0-only"
@@ -10,6 +10,7 @@ description = "Simple CLI to create/modify aleecers post template 🦀"
 repository = "https://github.com/aleecers/Alepc"
 keywords = ["helper", "CLI"]
 categories = ["command-line-utilities"]
+build = "build.rs"
 
 [dependencies]
 chrono = "= 0.4.22"
@@ -26,8 +27,12 @@ ron = "= 0.7.1"
 rust_search = "= 0.1.4"
 serde = { version = "= 1.0.140", features = ["derive"] }
 strum = { version = "= 0.24.1", features = ["derive"] }
-thiserror = "= 1.0.31"
+thiserror = "= 1.0.37"
 url = { version = "= 2.2.2", features = ["serde"] }
+
+[build-dependencies]
+vergen = { version = "= 7.4.2", default-features = false, features = ["git"] }
+anyhow = "1.0.66"
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
