@@ -19,7 +19,7 @@ use std::path::Path;
 
 use crate::{config::Config, utils::home_dir};
 use requestty::{prompt::Backend, question::Completions, Answers};
-use rust_search::Search;
+use rust_search::SearchBuilder;
 
 use super::{full_path, replace_tilde_with_home_dir, to_post_path, PostProperties};
 
@@ -45,33 +45,42 @@ pub fn autocomplete_files<'a>(
 ) -> impl FnMut(String, &Answers) -> Completions<String> + 'a {
     move |prefix, _| {
         let prefix = replace_tilde_with_home_dir(&prefix);
-        // Workaround file extension bug, see <https://github.com/ParthJadhav/rust_search/issues/4>
-        let extension = format!(r".*\{}", ext.unwrap_or(".*"));
-        let search = Search::new(
-            dir.unwrap_or(&home_dir()),
-            Some(&prefix),
-            Some(&extension),
-            None,
-        );
-        let mut files: Vec<String> = vec![prefix];
-
-        if file_name {
-            files.extend(search.map(|path| {
-                let mut path = Path::new(&path)
-                    .file_name()
-                    .expect("Failed to get file name")
-                    .to_str()
-                    .expect("Failed to convert file name to str");
-                // Remove file extension
-                if let Some(ext) = ext {
-                    path = path.trim_end_matches(ext);
-                }
-                path.to_owned()
-            }));
-        } else {
-            files.extend(search);
+        let search_location = dir.map(Into::into).unwrap_or_else(home_dir);
+        let mut files = SearchBuilder::default()
+            .location(search_location)
+            .ignore_case();
+        if let Some(ext) = ext {
+            // Add extension to search, if exsits
+            files = files.ext(ext);
         }
-        Completions::from(files)
+        // Build the search, and convert it to slice
+        let files: Vec<_> = files.build().collect();
+        let files = files.as_slice();
+
+        if files.is_empty() {
+            Completions::from([prefix])
+        } else if file_name && ext.is_some() {
+            // If file name is requested, and extension is provided
+            // Remove the extension from the file name
+            let ext = format!(".{}", ext.unwrap());
+            Completions::from(
+                files
+                    .iter()
+                    .map(|f| f.strip_suffix(&ext).unwrap_or(f).to_owned())
+                    .map(|f| {
+                        Path::new(&f)
+                            .file_name()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .to_owned()
+                    })
+                    .collect::<Vec<_>>(),
+            )
+        } else {
+            // There is no file name, and there is files
+            Completions::from(files)
+        }
     }
 }
 
