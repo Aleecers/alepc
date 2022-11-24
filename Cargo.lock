@@ -274,6 +274,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "dirs"
+version = "4.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca3aa72a6f96ea37bbc5aa912f6788242832f75369bdfdadcb0e38423f100059"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
 name = "dirs-sys"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -866,10 +875,11 @@ dependencies = [
 
 [[package]]
 name = "rust_search"
-version = "0.1.4"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3a51efd054f4c9b13b4bc3264585aaef741966c0ded7a2165fa149cbc0f2d90"
+checksum = "60154edcc2bbcfad18fb7cef7853a20e22c554e7cf597253034fb8733c654547"
 dependencies = [
+ "dirs",
  "ignore",
  "num_cpus",
  "regex",

@@ -24,7 +24,7 @@ pretty_env_logger = "= 0.4.0"
 regex = "= 1.6.0"
 requestty = "= 0.5.0"
 ron = "= 0.7.1"
-rust_search = "= 0.1.4"
+rust_search = "= 2.0.0"
 serde = { version = "= 1.0.140", features = ["derive"] }
 strum = { version = "= 0.24.1", features = ["derive"] }
 thiserror = "= 1.0.37"
