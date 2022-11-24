@@ -31,7 +31,7 @@ fn ask_for_post(config: &'static Config) -> Question {
         .transform(|slug, _, backend| write!(backend, "{}", to_post_path(config, slug)))
         .auto_complete(helpers::autocomplete_files(
             Some(&config.posts_path),
-            Some(".md"),
+            Some("md"),
             true,
         ))
         .when(helpers::is_modify_post(config))
