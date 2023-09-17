@@ -268,8 +268,8 @@ pub fn config() -> ApcResult<Config> {
     if config_path.exists() {
         match fs::read_to_string(config_path) {
             Ok(str_ron) => ron::from_str(&str_ron).map_err(|err| ApcError::ParseRon {
-                code: err.code,
                 position: err.position,
+                code: err,
             }),
             Err(err) => Err(ApcError::FileSystem(err.to_string())),
         }

@@ -18,7 +18,7 @@
 mod statuses;
 
 use colored::Colorize;
-use ron::error::{ErrorCode, Position};
+use ron::error::{Position, SpannedError};
 use strum::IntoStaticStr;
 use thiserror::Error;
 
@@ -27,7 +27,10 @@ pub use statuses::Statuses;
 #[derive(IntoStaticStr, Error, Debug, Clone)]
 pub enum ApcError {
     #[error("Cannot parse config file '{code}' in {position}")]
-    ParseRon { code: ErrorCode, position: Position },
+    ParseRon {
+        code: SpannedError,
+        position: Position,
+    },
     #[error("{0}")]
     Validation(String),
     #[error("{0}")]

@@ -199,7 +199,7 @@ impl Post {
         let old_path =
             get_modifing_post(config, answers).expect("The action should be `Modify` action");
         let status = ModifyStatus::from(answers);
-        let mut post = Post::from_file(config, &old_path)?;
+        let mut post = Post::from_file(config, old_path)?;
         let new_props = Props::modified_from_answers(answers)?;
 
         if post.slug != new_props.slug {
@@ -393,7 +393,7 @@ impl Post {
     pub fn path(&self, config: &'static Config) -> PathBuf {
         let slug = slug_updater(&self.slug);
         Path::new(&config.posts_path)
-            .join(&slug)
+            .join(slug)
             .with_extension("md")
     }
 

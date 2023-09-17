@@ -66,7 +66,8 @@ pub fn to_post_path(config: &Config, slug: &str) -> String {
 pub fn parse_str_date(date: &str, date_format: &str) -> ApcResult<DateTime<Local>> {
     NaiveDate::parse_from_str(date, date_format)
         .map_err(|err| ApcError::PostProperties(err.to_string()))?
-        .and_hms(0, 0, 0)
+        .and_hms_opt(0, 0, 0)
+        .expect("Failed to parse date")
         .and_local_timezone(Local)
         .single()
         .ok_or_else(|| {
